@@ -2,6 +2,7 @@
 /**
  * WebLoginPE
  * A progressively enhanced (PE) user management and login snippet for MODx
+ * v1.3.2 Beta 1
  * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
  *
  * @package WebLoginPE
@@ -1157,8 +1158,8 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 					
 					foreach ($CompleteUserList as $theUser)
 					{
-						if ($filterBy == 'webgroup')
-						{
+						switch($filterBy){
+							case 'webgroup':
 							$web_groups = $modx->getFullTableName('web_groups');
 							$webgroup_names = $modx->getFullTableName('webgroup_names');
 							$findWebGroup = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` = '".$filterValue."'");
@@ -1178,9 +1179,9 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-						}
-						else if ($filterBy == 'online')
-						{
+								break;
+
+							case 'online':
 							$active_users = $modx->getFullTableName('active_users');
 							$activityCheck = "SELECT * FROM ".$active_users." WHERE `internalKey` = '-".$theUser['internalKey']."'";
 							$lastActive = $modx->db->query($activityCheck);
@@ -1203,11 +1204,9 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-						}
-						else
-						{
-							foreach ($theUser as $attribute => $value)
-							{
+								break;					
+
+							default:
 								if (empty($theUser[$filterBy]) || $theUser[$filterBy] == '' && $filterBy !== 'webgroup')
 								{
 									$username = $theUser['username'];
@@ -1227,10 +1226,11 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 										}
 									}
 								}
+								break;	
 							}
 						}
 					}
-				}
+
 				// SORT ARRAY
 				$sortArray = array();
 			    foreach($CompleteUserList as $username => $attributes)
@@ -1322,6 +1322,7 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 				$FinalDisplay .= $CombinedList;
 			}
 		}
+		$FinalDisplay = (empty($FinalDisplay)?"<p>No results.</p>":$FinalDisplay);
 		return $FinalDisplay;
 	}
 	

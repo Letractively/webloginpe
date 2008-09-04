@@ -1,6 +1,6 @@
 <?php
 	/**
-	 * WebLoginPE Snippet 1.3.1
+	 * WebLoginPE Snippet 1.3.2 Beta 1
 	 * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
 	 *
 	 * @package WebLoginPE
