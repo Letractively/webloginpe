@@ -14,6 +14,9 @@
 	$regType = isset($regType) ? $regType : 'instant';
 	$notify = isset($notify) ? $notify : '';
 	$groups = isset($groups) ? $groups : '';
+	$groupsField = isset($groupsField) ? $groupsField : '';
+	$approvedDomains = isset($approvedDomains) ? $approvedDomains : '';
+    $pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
 	$regRequired = isset($regRequired) ? $regRequired : '';
 	$customTable = isset($customTable) ? $customTable : 'web_user_attributes_extended';
 	$customFields = isset($customFields) ? $customFields : '';
@@ -23,7 +26,8 @@
 	$dateFormat = isset($dateFormat) ? $dateFormat : '%A %B %d, %Y at %I:%M %p';
 	$disableServices = isset($disableServices) ? explode(',', str_replace(', ',',',$disableServices)) : array();
 	$tableCheck = isset($tableCheck) ? $tableCheck : 1;
-	$paging = isset($paging) ? $paging : 3000;	
+	$paging = isset($paging) ? $paging : 3000;
+	
 	include_once MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.class.php';
 	include MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.templates.php';
 	if (file_exists(MODX_BASE_PATH.'assets/snippets/webloginpe/lang/'.$lang.'.php'))
@@ -48,6 +52,10 @@
 	$profileHomeId = isset($profileHomeId) ? $profileHomeId : '';
 	$inputHandler = isset($inputHandler) ? explode('||', $inputHandler) : array();
 	$usersList = isset($usersList) ? $usersList : '';
+	
+	$activateId = isset($activateId) ? $activateId : $modx->documentIdentifier;
+	$activateConfig = isset($activateConfig) ? $activateConfig : '';
+	$activatePost = isset($activatePost) ? $activatePost : '';
 	
 	if ($regType == 'verify'){$wlpeRegisterTpl = $wlpeRegisterVerifyTpl;}else{$wlpeRegisterTpl = $wlpeRegisterInstantTpl;}
 	
@@ -107,13 +115,16 @@
 		{
 			case 'register' :
 				if (in_array('register', $disableServices)){return;}
-				$registration = $wlpe->Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject);
+				$registration = $wlpe->Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject,$approvedDomains,$pendingGroups);
 				
 				if (isset($regSuccessId) && $regSuccessId !== '')
 				{
 					if ($registration == 'success')
 					{
-						$url = $modx->makeURL($regSuccessId);                        $modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');						//header('Refresh: '.$regSuccessPause.';URL='.$url);						return $displayRegSuccessTpl;
+						$url = $modx->makeURL($regSuccessId);
+                        $modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
+						//header('Refresh: '.$regSuccessPause.';URL='.$url);
+						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;
 					
@@ -230,11 +241,31 @@
 				
 			case 'saveuserprofile' :
 				if (in_array('saveuserprofile', $disableServices)){return;}
-				$wlpe->SaveUserProfile($_POST['internalKey']);
+				// Added to allow setting the groups via a form
+				if (!empty($_REQUEST[$groupsField])){
+					if(is_array($_REQUEST[$groupsField])){
+						$groups = implode(",", $_REQUEST[$groupsField]);
+					} else {
+					$groups = $_REQUEST[$groupsField];
+				}
+				}
+				$wlpe->SaveUserProfile($_POST['internalKey'],$groups);
 				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
 				return $manageUsersPage;
 				break;
 				
+			case 'approveuser' :
+				if (in_array('approveuser', $disableServices)){return;}
+				// Added to allow setting the groups via a form
+				if (!empty($_REQUEST[$groupsField])){
+					$groups = $_REQUEST[$groupsField];
+				}
+				$activate = true;
+				$wlpe->SaveUserProfile($_POST['internalKey'],$groups,$activate,$activateId,$activateConfig,$activatePost);
+				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+				return $manageUsersPage;
+				break;				
+
 			case 'messageuser':
 				if (in_array('messageuser', $disableServices)){return;}
 				$wlpe->SendMessageToUser();
@@ -331,7 +362,8 @@
 					if ($registration == 'success')
 					{
 						$url = $modx->makeURL($regSuccessId);
-						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');						//header('Refresh: '.$regSuccessPause.';URL='.$url);
+						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
+						//header('Refresh: '.$regSuccessPause.';URL='.$url);
 						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;

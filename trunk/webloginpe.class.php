@@ -168,12 +168,12 @@ class WebLoginPE
 	 *
 	 * @see __construct
 	 */
-	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
-	{
-        if(substr(phpversion(),0,1) < 5){
-			$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
-		}
-    }
+    	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+    	{
+            if(substr(phpversion(),0,1) < 5){
+    		    $this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+    	    }    
+        }
 	
 	
 	/**
@@ -414,7 +414,7 @@ class WebLoginPE
 	 * @author Raymond Irving
 	 * @author Scotty Delicious
 	 */
-	function Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject)
+	function Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject, $approvedDomains='',$pendingGroups='')
 	{
 		global $modx;
 		
@@ -572,7 +572,7 @@ class WebLoginPE
 		}
 		
 		// If you want to verify your users email address before letting them log in, this generates a random password.
-		if ($regType == 'verify')
+		if ($regType == 'verify' || $regType == 'pending')
 		{
 			$password = $this->GeneratePassword(10);
 		}
@@ -638,6 +638,26 @@ class WebLoginPE
 			}
 		}
 		
+		// Set group to pending
+		if ($regType == 'pending') {
+			$groups = $pendingGroups;
+		}
+
+		// Set group for auto approved domains
+		if(!empty($approvedDomains)){
+			$domainSets = split("\|\|",$approvedDomains);
+			$userEmail = split("@",$email);
+			foreach($domainSets as $set){
+				$set = split(":",$set);
+				$domains = split(",",$set[0]);
+				$group = $set[1];
+				if (in_array($userEmail[1], $domains)) {
+				    $groups = $group;
+					$regType = 'verify';
+				}				
+			}
+		}
+
 		$groups = str_replace(', ', ',', $groups);
 		$GLOBALS['groupsArray'] = explode(',', $groups);
 		
@@ -664,42 +684,45 @@ class WebLoginPE
 		// EVENT: OnWebSaveUser
 		$this->OnWebSaveUser('new', $NewUser);
 		
-		// Replace some placeholders in the Config websignupemail message.
-		$messageTpl = $modx->config['websignupemail_message'];
-		$myEmail = $modx->config['emailsender'];
-        $emailSubject = $modx->config['emailsubject'];
-		$siteName = $modx->config['site_name'];
-		$siteURL = $modx->config['site_url'];
-		
-		$message = str_replace('[+uid+]', $username, $messageTpl);
-        $message = str_replace('[+pwd+]', $password, $message);
-        $message = str_replace('[+ufn+]', $fullname, $message);
-        $message = str_replace('[+sname+]', $siteName, $message);
-        $message = str_replace('[+semail+]', $myEmail, $message);
-        $message = str_replace('[+surl+]', $siteURL, $message);
-		foreach ($_POST as $name => $value)
-		{
-			$toReplace = '[+post.'.$name.'+]';
-			$message = str_replace($toReplace, $value, $message);
-		}
-
-		// Bring in php mailer!
-		$Register = new PHPMailer();
-		$Register->CharSet = $modx->config['modx_charset'];
-		$Register->From = $myEmail;
-		$Register->FromName = $siteName;
-		$Register->Subject = $emailSubject;
-		$Register->Body = $message;
-		$Register->AddAddress($email, $fullname);
-		
-		if (!$Register->Send())
-		{
-			return $this->FormatMessage($this->LanguageArray[12]);
+		if ($regType != 'pending') {
+    		// Replace some placeholders in the Config websignupemail message.
+    		$messageTpl = $modx->config['websignupemail_message'];
+    		$myEmail = $modx->config['emailsender'];
+            $emailSubject = $modx->config['emailsubject'];
+    		$siteName = $modx->config['site_name'];
+    		$siteURL = $modx->config['site_url'];
+    		
+    		$message = str_replace('[+uid+]', $username, $messageTpl);
+            $message = str_replace('[+pwd+]', $password, $message);
+            $message = str_replace('[+ufn+]', $fullname, $message);
+            $message = str_replace('[+sname+]', $siteName, $message);
+            $message = str_replace('[+semail+]', $myEmail, $message);
+            $message = str_replace('[+surl+]', $siteURL, $message);
+    		foreach ($_POST as $name => $value)
+    		{
+    			$toReplace = '[+post.'.$name.'+]';
+    			$message = str_replace($toReplace, $value, $message);
+    		}
+    
+    		// Bring in php mailer!
+    		$Register = new PHPMailer();
+    		$Register->CharSet = $modx->config['modx_charset'];
+    		$Register->From = $myEmail;
+    		$Register->FromName = $siteName;
+    		$Register->Subject = $emailSubject;
+    		$Register->Body = $message;
+    		$Register->AddAddress($email, $fullname);
+    		
+    		if (!$Register->Send())
+    		{
+    			return $this->FormatMessage($this->LanguageArray[12]);
+    		}
 		}
 		
 		// Add the list of administrators to be notified on new registration to a Blind Carbon Copy.
 		if (isset($notify) && $notify !== '')
 		{
+            $notify = ($notify == 'default' ? $modx->config['emailsender'] : $notify);
 			$emailList = str_replace(', ', ',', $notify);
 			$emailArray = explode(',', $emailList);
 			
@@ -826,7 +849,7 @@ class WebLoginPE
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function SaveUserProfile($internalKey = '')
+	function SaveUserProfile($internalKey = '',$groups = '',$activate = false, $activateId = '',$activateConfig='',$activatePost='')
 	{
 		global $modx;
 		if ($internalKey == '' || empty($internalKey))
@@ -843,6 +866,8 @@ class WebLoginPE
 		
 		$web_users = $modx->getFullTableName('web_users');
 		$web_user_attributes = $modx->getFullTableName('web_user_attributes');
+		$web_groups = $modx->getFullTableName('web_groups');
+		$webgroup_names = $modx->getFullTableName('webgroup_names');
 		
 		// EVENT: OnBeforeWebSaveUser
 		$this->OnBeforeWebSaveUser(array(), array()); // pixelchutes
@@ -927,7 +952,7 @@ class WebLoginPE
 				$_POST['dob'] = $this->MakeDateForDb($_POST['dob']);
 			}
 			if ($field!='photo' || ($_FILES['photo']['name'] !== '' && !empty($_FILES['photo']['name']))) // for update db with value and blank value (except if the field is 'photo')
-{
+			{
 				// CREDIT: Mike Reid (aka Pixelchutes) for the string escape code.
 				$charset=$modx->config['modx_charset'];
 				$generalElementsUpdate[] = " `".$field."` = '".$modx->db->escape(stripslashes(htmlentities(trim($_POST[$field]), ENT_QUOTES, $modx->config['modx_charset']))).	"'";
@@ -971,6 +996,113 @@ class WebLoginPE
 		// Prepare the query for General Elements
 		$generalElementsSQL = "UPDATE ".$web_user_attributes." SET ".implode(', ', $generalElementsUpdate)." WHERE `internalkey` = '".$internalKey."'";
 		
+		// Set custom configuration of activation
+		if($activate && !empty($activateConfig) && !empty($activatePost)){
+		    // FORMAT: activationType:groups:template:emailSubject|activationType:groups:template:emailSubject
+			$activateGroups = split("\|",$activateConfig);
+            foreach($activateGroups as $activateGroup){
+                $typeConfig = split(":",$activateGroup);
+                if($_POST[$activatePost] == $typeConfig[0]){
+                    $groups = $typeConfig[1];
+                    $messageTpl = $this->Template($typeConfig[2]);
+                    $emailSubject = (isset($typeConfig[3]) ? $typeConfig[3]:"");
+                    break;      
+                }
+            }
+		}
+		
+		// Update webuser groups
+		if(!empty($groups)){
+			// Flush existing group settings 
+			$deleteFromGroups = $modx->db->query("DELETE FROM ".$web_groups." WHERE `webuser`='".$internalKey."'");
+
+			$groups = str_replace(', ', ',', $groups);
+			$GLOBALS['groupsArray'] = explode(',', $groups);
+		
+			// EVENT: OnBeforeAddToGroup
+			$this->OnBeforeAddToGroup($GLOBALS['groupsArray']);
+			if (count($groupArray > 0))
+			{
+				$groupsList = "'".implode("','", $GLOBALS['groupsArray'])."'";			
+				$groupNames = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` IN (".$groupsList.")");
+				if (!$groupNames)
+				{
+					return $this->FormatMessage($this->LanguageArray[11]);
+				}
+				else
+				{
+					while ($row = $modx->db->getRow($groupNames))
+					{
+						$webGroupId = $row['id'];
+						$modx->db->query("REPLACE INTO ".$web_groups." (`webgroup`, `webuser`) VALUES ('".$webGroupId."', '".$internalKey."')");
+					}
+				}
+			}			
+		}
+		
+		// Send activation e-mail to user if approved
+		if ($activate) {
+			$findUser = "SELECT * FROM ".$web_user_attributes.", ".$web_users." WHERE ".$web_users.".`id`='".$internalKey."' AND ".$web_user_attributes.".`internalKey`=".$web_users.".`id`";
+			$userInfo = $modx->db->query($findUser);
+			$limit = $modx->recordCount($userInfo);	
+			if ($limit == 1){
+				// Generate new password
+				$newPassword = $this->GeneratePassword(10);
+				$newPasswordKey = $this->GeneratePassword(10);
+				$this->User = $modx->db->getRow($userInfo);
+				$insertNewPassword = "UPDATE ".$web_users." SET cachepwd='".$newPassword."|".$newPasswordKey."' WHERE id='".$this->User['internalKey']."'";
+				$setCachePassword = $modx->db->query($insertNewPassword);
+				
+				// build activation url
+            	$activateId = (!empty($activateId) ? $activateId : $modx->documentIdentifier);
+	            if($_SERVER['SERVER_PORT']!='80'){
+					$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
+				}else{
+					$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
+					//$url = $_SERVER['HTTP_REFERER']."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey;
+	            }
+
+				// Replace some placeholders in the Config websignupemail message.
+				if(empty($messageTpl)){
+				    $messageTpl = $modx->config['webpwdreminder_message'];				    
+				}
+				if(empty($emailSubject)){
+				    $emailSubject = $modx->config['emailsubject'];
+				}
+				$myEmail = $modx->config['emailsender'];
+				$siteName = $modx->config['site_name'];
+				$siteURL = $modx->config['site_url'];				
+
+				$message = str_replace("[+uid+]", $this->User['username'], $messageTpl);
+	            $message = str_replace("[+pwd+]", $newPassword, $message);
+	            $message = str_replace("[+ufn+]", $this->User['fullname'], $message);
+	            $message = str_replace("[+sname+]", $siteName, $message);
+	            $message = str_replace("[+semail+]", $myEmail, $message);
+	            $message = str_replace("[+surl+]", $url, $message);
+
+				foreach ($_POST as $name => $value){
+					$toReplace = '[+post.'.$name.'+]';
+					$message = str_replace($toReplace, $value, $message);
+				}
+
+
+				// Bring in php mailer!
+				$Register = new PHPMailer();
+				$Register->CharSet = $modx->config['modx_charset'];
+				$Register->From = $myEmail;
+				$Register->FromName = $siteName;
+				$Register->Subject = $emailSubject;
+				$Register->Body = $message;
+				$Register->AddAddress($this->User['email'], $this->User['fullname']);
+				
+				if (!$Register->Send())
+				{
+					return $this->FormatMessage($this->LanguageArray[12]);
+				}
+			}	
+		}
+		
+
 		// Execute the database queries.
 		if( count($generalElementsUpdate) > 0 ) $saveMyProfile = $modx->db->query($generalElementsSQL);
 		if (!empty($this->CustomFields) && $this->CustomFields !== '')
