@@ -441,7 +441,7 @@ class WebLoginPE
 		$cachepwd = time();
 		
 		// Check for required fields.
-if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['username']) == '' ) // pixelchutes
+        if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['username']) == '' ) // pixelchutes
 		{			
 			return $this->FormatMessage($this->LanguageArray[0]);
 		}
@@ -714,6 +714,8 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 				$toReplace = '[+post.'.$name.'+]';
 				$notification = str_replace($toReplace, $value, $notification);
 			}
+			// Cleanup any unused placeholders
+			$notification = ereg_replace('\[\+post\.+[a-zA-Z]+\+\]', '', $notification);
 			
 			$Notify = new PHPMailer();
 			$Notify->CharSet = $modx->config['modx_charset'];
