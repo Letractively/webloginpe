@@ -23,7 +23,7 @@
 	$dateFormat = isset($dateFormat) ? $dateFormat : '%A %B %d, %Y at %I:%M %p';
 	$disableServices = isset($disableServices) ? explode(',', str_replace(', ',',',$disableServices)) : array();
 	$tableCheck = isset($tableCheck) ? $tableCheck : 1;
-	
+	$paging = isset($paging) ? $paging : 3000;	
 	include_once MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.class.php';
 	include MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.templates.php';
 	if (file_exists(MODX_BASE_PATH.'assets/snippets/webloginpe/lang/'.$lang.'.php'))
@@ -37,7 +37,7 @@
 		print '[+wlpe.message+]';
 	}
 	
-	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type);
+	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging);
 	$wlpe->CustomTable($customTable, $customFields, $prefixTable, $tableCheck);
 
 	$liHomeId = isset($liHomeId) ? explode(',', $liHomeId) : '';
