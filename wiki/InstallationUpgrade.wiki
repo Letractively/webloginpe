@@ -1,12 +1,5 @@
-#summary One-sentence summary of this page.
+#summary Steps to perform a new install or upgrade of an existing install.
 #labels install,upgrade
-
-= Introduction =
-
-Steps to perform a new install or upgrade of an existing install.
-
-
-= Details =
 
 ==*New Install*==
  # Upload the "webloginpe" folder and all it's contents to /assets/snippets/ in your MODx installation.
