@@ -113,9 +113,7 @@
 				{
 					if ($registration == 'success')
 					{
-						$url = rtrim($modx->config['site_url'], '/').$modx->makeURL($regSuccessId);
-						header('Refresh: '.$regSuccessPause.';URL='.$url);
-						return $displayRegSuccessTpl;
+						$url = $modx->makeURL($regSuccessId);                        $modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');						//header('Refresh: '.$regSuccessPause.';URL='.$url);						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;
 					
@@ -332,8 +330,8 @@
 				{
 					if ($registration == 'success')
 					{
-						$url = rtrim($modx->config['site_url'], '/').$modx->makeURL($regSuccessId);
-						header('Refresh: '.$regSuccessPause.';URL='.$url);
+						$url = $modx->makeURL($regSuccessId);
+						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');						//header('Refresh: '.$regSuccessPause.';URL='.$url);
 						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;
