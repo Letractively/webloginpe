@@ -925,11 +925,6 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 			}
 			if ($field!='photo' || ($_FILES['photo']['name'] !== '' && !empty($_FILES['photo']['name']))) // for update db with value and blank value (except if the field is 'photo')
 {
-	// CREDIT: Mike Reid (aka Pixelchutes) for the string escape code.
-	$charset='"'.$modx->config['modx_charset'].'"';
-	$generalElementsUpdate[] = " `".$field."` = '".$modx->db->escape(stripslashes(htmlentities(trim($_POST[$field]), ENT_QUOTES, $modx->config['modx_charset'])))."'";
-}
-			{
 				// CREDIT: Mike Reid (aka Pixelchutes) for the string escape code.
 				$charset=$modx->config['modx_charset'];
 				$generalElementsUpdate[] = " `".$field."` = '".$modx->db->escape(stripslashes(htmlentities(trim($_POST[$field]), ENT_QUOTES, $modx->config['modx_charset']))).	"'";
