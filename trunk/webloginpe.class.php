@@ -169,8 +169,10 @@ class WebLoginPE
 	 */
 	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
 	{
-		$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
-	}
+        if(substr(phpversion(),0,1) < 5){
+			$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+		}
+    }
 	
 	
 	/**
