@@ -1455,7 +1455,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -1518,7 +1518,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -1550,7 +1550,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
@@ -1884,7 +1884,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -1944,7 +1944,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -1976,7 +1976,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
