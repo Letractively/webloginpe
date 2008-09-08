@@ -1,0 +1,12 @@
+#summary The parameters used in an WebLoginPE call.
+#labels parameters
+
+= &lang =
+
+WebLoginPE separates all language specific strings into a separate file stored in /webloginpe/lang/ (the default is english "en.php"). You can help by translating en.php into another language if you are multi-lingual.
+
+For instance, if you used the French translation, you would use...
+
+{{{
+[!WebLoginPE? &lang=`fr`!]
+}}}
