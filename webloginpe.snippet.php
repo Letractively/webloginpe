@@ -8,7 +8,26 @@
 	 * @version 1.3.1
 	 *
 	 * See the "docs" folder for detailed usage and parameter instructions.
+	 *
+     * New parameters for multiple instances:
+     * &id=`...` instancename that identifies this instance of WLPE call
+     * &hide=`0|1` if this instance must disappear when an other instance gets in action
 	 */
+
+	$service = $_REQUEST['service'];
+	if (empty($service) || $service == '')
+	{
+		$service = $_REQUEST['serviceButtonValue'];
+	}
+
+	$id = isset($id) ? $id: '';
+	$req_id = $_REQUEST['wlpeID'] ? $_REQUEST['wlpeID'] : '';
+	$hide = isset($hide) ? $hide : 0; // or 1 if you prefer to hide as default ;)
+	if ($service && $id != $req_id) 
+	{
+		if ($hide) return; // skip this instance
+		$service=''; // run this instance without mess
+	}
 
 	$type = isset($type) ? $type : 'simple';
 	$regType = isset($regType) ? $regType : 'instant';
@@ -16,7 +35,7 @@
 	$groups = isset($groups) ? $groups : '';
 	$groupsField = isset($groupsField) ? $groupsField : '';
 	$approvedDomains = isset($approvedDomains) ? $approvedDomains : '';
-    $pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
+	$pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
 	$regRequired = isset($regRequired) ? $regRequired : '';
 	$customTable = isset($customTable) ? $customTable : 'web_user_attributes_extended';
 	$customFields = isset($customFields) ? $customFields : '';
@@ -57,24 +76,24 @@
 	$activateConfig = isset($activateConfig) ? $activateConfig : '';
 	$activatePost = isset($activatePost) ? $activatePost : '';
 	
-	if ($regType == 'verify'){$wlpeRegisterTpl = $wlpeRegisterVerifyTpl;}else{$wlpeRegisterTpl = $wlpeRegisterInstantTpl;}
+	if ($regType == 'verify'){$wlpeRegisterTpl = $wlpe->AddInstance($wlpeRegisterVerifyTpl, $id);}else{$wlpeRegisterTpl = $wlpe->AddInstance($wlpeRegisterInstantTpl, $id);}
 	
-	$displayLoginFormTpl = isset($loginFormTpl) ? $wlpe->Template($loginFormTpl) : $wlpeDefaultFormTpl;
-	$displaySuccessTpl = isset($successTpl) ? $wlpe->Template($successTpl) : $wlpeDefaultSuccessTpl;
-	$displayRegisterTpl = isset($registerTpl) ? $wlpe->Template($registerTpl) : $wlpeRegisterTpl;
-	$displayRegSuccessTpl = isset($registerSuccessTpl) ? $wlpe->Template($registerSuccessTpl) : $wlpeDefaultFormTpl;
-	$displayProfileTpl = isset($profileTpl) ? $wlpe->Template($profileTpl) : $wlpeProfileTpl;
-	$displayViewProfileTpl = isset($viewProfileTpl) ? $wlpe->Template($viewProfileTpl) : $wlpeViewProfileTpl;
-	$displayUsersOuterTpl = isset($usersOuterTpl) ? $wlpe->Template($usersOuterTpl) : $wlpeUsersOuterTpl;
-	$displayUsersTpl = isset($usersTpl) ? $wlpe->Template($usersTpl) : $wlpeUsersTpl;
-	$displayManageOuterTpl = isset($manageOuterTpl) ? $wlpe->Template($manageOuterTpl) : $wlpeUsersOuterTpl;
-	$displayManageTpl = isset($manageTpl) ? $wlpe->Template($manageTpl) : $wlpeManageTpl;
-	$displayManageProfileTpl = isset($manageProfileTpl) ? $wlpe->Template($manageProfileTpl) : $wlpeManageProfileTpl;
-	$displayManageDeleteTpl = isset($manageDeleteTpl) ? $wlpe->Template($manageDeleteTpl) : $wlpeManageDeleteTpl;
-	$displayProfileDeleteTpl = isset($profileDeleteTpl) ? $wlpe->Template($profileDeleteTpl) : $wlpeProfileDeleteTpl;
-	$displayActivateTpl = isset($activateTpl) ? $wlpe->Template($activateTpl) : $wlpeActivateTpl;
-	$displayResetTpl = isset($resetTpl) ? $wlpe->Template($resetTpl) : $wlpeResetTpl;
-	$notifyTpl = isset($notifyTpl) ? $wlpe->Template($notifyTpl) : $wlpeNotifyTpl;
+	$displayLoginFormTpl = $wlpe->AddInstance(isset($loginFormTpl) ? $wlpe->Template($loginFormTpl) : $wlpeDefaultFormTpl, $id);
+	$displaySuccessTpl = $wlpe->AddInstance(isset($successTpl) ? $wlpe->Template($successTpl) : $wlpeDefaultSuccessTpl, $id);
+	$displayRegisterTpl = $wlpe->AddInstance(isset($registerTpl) ? $wlpe->Template($registerTpl) : $wlpeRegisterTpl, $id);
+	$displayRegSuccessTpl = $wlpe->AddInstance(isset($registerSuccessTpl) ? $wlpe->Template($registerSuccessTpl) : $wlpeDefaultFormTpl, $id);
+	$displayProfileTpl = $wlpe->AddInstance(isset($profileTpl) ? $wlpe->Template($profileTpl) : $wlpeProfileTpl, $id);
+	$displayViewProfileTpl = $wlpe->AddInstance(isset($viewProfileTpl) ? $wlpe->Template($viewProfileTpl) : $wlpeViewProfileTpl, $id);
+	$displayUsersOuterTpl = $wlpe->AddInstance(isset($usersOuterTpl) ? $wlpe->Template($usersOuterTpl) : $wlpeUsersOuterTpl, $id);
+	$displayUsersTpl = $wlpe->AddInstance(isset($usersTpl) ? $wlpe->Template($usersTpl) : $wlpeUsersTpl, $id);
+	$displayManageOuterTpl = $wlpe->AddInstance(isset($manageOuterTpl) ? $wlpe->Template($manageOuterTpl) : $wlpeUsersOuterTpl, $id);
+	$displayManageTpl = $wlpe->AddInstance(isset($manageTpl) ? $wlpe->Template($manageTpl) : $wlpeManageTpl, $id);
+	$displayManageProfileTpl = $wlpe->AddInstance(isset($manageProfileTpl) ? $wlpe->Template($manageProfileTpl) : $wlpeManageProfileTpl, $id);
+	$displayManageDeleteTpl = $wlpe->AddInstance(isset($manageDeleteTpl) ? $wlpe->Template($manageDeleteTpl) : $wlpeManageDeleteTpl, $id);
+	$displayProfileDeleteTpl = $wlpe->AddInstance(isset($profileDeleteTpl) ? $wlpe->Template($profileDeleteTpl) : $wlpeProfileDeleteTpl, $id);
+	$displayActivateTpl = $wlpe->AddInstance(isset($activateTpl) ? $wlpe->Template($activateTpl) : $wlpeActivateTpl, $id);
+	$displayResetTpl = $wlpe->AddInstance(isset($resetTpl) ? $wlpe->Template($resetTpl) : $wlpeResetTpl, $id);
+	$notifyTpl = $wlpe->AddInstance(isset($notifyTpl) ? $wlpe->Template($notifyTpl) : $wlpeNotifyTpl, $id);
 	$notifySubject = isset($notifySubject) ? $notifySubject : 'New Web User for '.$modx->config['site_name'].'.';
 	$messageTpl = isset($messageTpl) ? $wlpe->Template($messageTpl) : $wlpeMessageTpl;
 	$tosChunk = isset($tosChunk) ? $wlpe->Template($tosChunk) : $wlpeTos;
@@ -102,12 +121,6 @@
 	
 	$modx->regClientStartupScript('assets/snippets/webloginpe/js/ieButtonFix.js');
 
-	$service = $_REQUEST['service'];
-	if (empty($service) || $service == '')
-	{
-		$service = $_REQUEST['serviceButtonValue'];
-	}
-	
 	if ($type == 'register')
 	{
 		if (in_array('register', $disableServices)){return;}
@@ -122,7 +135,7 @@
 					if ($registration == 'success')
 					{
 						$url = $modx->makeURL($regSuccessId);
-                        $modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
+						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
 						//header('Refresh: '.$regSuccessPause.';URL='.$url);
 						return $displayRegSuccessTpl;
 					}
@@ -139,7 +152,7 @@
 			case 'cancel':
 				if ($loHomeId == '') $loHomeId = $modx->config['site_start'];
 				$url = $modx->makeURL($loHomeId);
-		        $modx->sendRedirect($url,0,'REDIRECT_REFRESH');
+				$modx->sendRedirect($url,0,'REDIRECT_REFRESH');
 				break;
 			
 			case 'login' :
@@ -178,7 +191,7 @@
 			case 'cancel':
 				if ($loHomeId == '') $loHomeId = $modx->config['site_start'];
 				$url = $modx->makeURL($loHomeId);
-		        $modx->sendRedirect($url,0,'REDIRECT_REFRESH');
+				$modx->sendRedirect($url,0,'REDIRECT_REFRESH');
 				break;
 				
 			case 'logout':
@@ -222,7 +235,7 @@
 				break;
 			
 			default :
-				$userpage = $wlpe->ViewAllUsers($displayUsersTpl, $displayUsersOuterTpl, $usersList);
+				$userpage = $wlpe->ViewAllUsers($displayUsersTpl, $displayUsersOuterTpl, $usersList, $id);
 				return $userpage;
 		}
 		return;
@@ -250,7 +263,7 @@
 				}
 				}
 				$wlpe->SaveUserProfile($_POST['internalKey'],$groups);
-				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList, $id);
 				return $manageUsersPage;
 				break;
 				
@@ -262,7 +275,7 @@
 				}
 				$activate = true;
 				$wlpe->SaveUserProfile($_POST['internalKey'],$groups,$activate,$activateId,$activateConfig,$activatePost);
-				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList, $id);
 				return $manageUsersPage;
 				break;				
 
@@ -281,13 +294,13 @@
 			case 'confirmdeleteuser':
 				if (in_array('confirmdeleteuser', $disableServices)){return;}
 				$wlpe->RemoveUserProfileManager($_SESSION['editInternalKey']);
-				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList, $id);
 				unset($_SESSION['editInternalKey']);
 				return $manageUsersPage;
 				break;
 			
 			default :
-				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList, $id);
 				return $manageUsersPage;
 		}
 		return;
@@ -320,8 +333,8 @@
 					return $displayProfileTpl;
 				}
 				$url = $modx->makeURL($profileHomeId);
-		        $modx->sendRedirect($url,0,'REDIRECT_REFRESH');
-		        return;
+				$modx->sendRedirect($url,0,'REDIRECT_REFRESH');
+				return;
 				break;
 				
 			case 'saveprofilesimple' :
@@ -349,8 +362,8 @@
 					return $displayRegisterTpl;
 				}
 				$url = $modx->makeURL($regHomeId);
-		        $modx->sendRedirect($url,0,'REDIRECT_REFRESH');
-		        return;
+				$modx->sendRedirect($url,0,'REDIRECT_REFRESH');
+				return;
 				break;
 				
 			case 'register':
@@ -404,19 +417,19 @@
 				break;
 			
 			case 'activated':
-                if (in_array('activated', $disableServices)){return;}
-                $wlpe->ActivateUser();
-                // pixelchutes 1:57 AM 9/19/2007
-                // Here we check for an error, then reload the activation template if necessary
-                // Do NOT reload if wlpe->Report indicates success
-                 // Added strip_tags() around string which means an error is not thrown regarding a modifier from closing
-                // html tag e.g. if $wlpe_lang[104] contains "</div>" this will fail as "/d" treated as modifier
-                if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang[104])."/i", $wlpe->Report ) )
-                {
-                    return $displayActivateTpl;
-                }                
-                return $displayLoginFormTpl;
-                break;
+				if (in_array('activated', $disableServices)){return;}
+				$wlpe->ActivateUser();
+				// pixelchutes 1:57 AM 9/19/2007
+				// Here we check for an error, then reload the activation template if necessary
+				// Do NOT reload if wlpe->Report indicates success
+				 // Added strip_tags() around string which means an error is not thrown regarding a modifier from closing
+				// html tag e.g. if $wlpe_lang[104] contains "</div>" this will fail as "/d" treated as modifier
+				if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang[104])."/i", $wlpe->Report ) )
+				{
+					return $displayActivateTpl;
+				}                
+				return $displayLoginFormTpl;
+				break;
 			
 			default :
 				
