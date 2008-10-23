@@ -6,7 +6,9 @@
  # Access your MODx Manager.
  # Go to "Resources" > "Manage Resources" > "Snippets" and create a new snippet.
  # Name this snippet WebLoginPE. Add this description...
-  * <strong>1.3.2</strong> A progressively enhanced, complete Web User management snippet.
+{{{
+<strong>1.3.2</strong> A progressively enhanced, complete Web User management snippet.
+}}}
  # Open *webloginpe.snippet.php* and copy it's contents to the snippet code area back in the manager. Save the snippet.
 
 ==*Upgrade from 1.3.1*==
