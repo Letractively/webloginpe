@@ -3,9 +3,9 @@
 
 = &lang =
 
-WebLoginPE separates all language specific strings into a separate file stored in /webloginpe/lang/ (the default is english "en.php"). You can help by translating en.php into another language if you are multi-lingual.
+All of the language strings in WebLoginPE are stored in a file in /webloginpe/lang/ (default is *en.php*). You can help translate *en.php* if you are multi-lingual.
 
-For instance, if you used the French translation, you would use...
+As an example, if you used the French translation, you would call it like this...
 
 {{{
 [!WebLoginPE? &lang=`fr`!]
@@ -13,14 +13,14 @@ For instance, if you used the French translation, you would use...
 
 = &type =
 
-WebLoginPE has many functions (and each of those functions has many functions). There are six basic types. They are *simple*, *register*, *profile*, *users*, *manager* and *taconite*.
+WebLoginPE currently has six basic functions that determines what it can do when you call it in a page in MODx. They are...
 
-  * *simple* WebLoginPE can handle most of the tasks involved in user management (Login, Logout, Registration, Profile editing, etc...). This is the default mode.
-  * *register* handles all the functions of creating new users.
-  * *profile* allows a user to manage the details of their account (their attributes).
-  * *users* displays a list of all registered users (customizable and templateable) and provides links to view the user attributes individually as well as message the user.
-  * *manager*, much like *users*, displays a list of the web users, but adds the ability to edit or delete any users. This should be accessible to Admins only
-  * *taconite* provides the functionality of WebLoginPE but squelches the output so you can handle those functions asynchronously (AJAX).
+  * *simple* is the default mode for WebLoginPE.
+  * *register* adds new Web Users to MODx.
+  * *profile* allows a user to manage their account.
+  * *users* displays a list of all registered users (customizable and template-able). The user can then view user's accounts individually, as well as message the user.
+  * *manager* works like _users_, but allows for editing anyone's account (_profile_, but on a global scale). This should only be given to admins.
+  * *taconite* provides the functionality of WebLoginPE but squelches the output so you can handle those functions asynchronously using AJAX.
 
 {{{
 [!WebLoginPE? &type=`users`!] 
