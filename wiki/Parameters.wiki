@@ -1,5 +1,5 @@
 #summary The parameters used in an WebLoginPE call.
-#labels Phase-Deploy,Phase-Implementation
+#labels Phase-Deploy,Phase-Support
 
 = &lang =
 
