@@ -1,0 +1,12 @@
+#summary The API (Instance Variables) calls for WebLoginPE.
+#labels Phase-Implementation
+
+= LanguageArray =
+
+An array of language specific phrases.
+
+{{{
+@var array
+@access public
+@see __construct()
+}}}
