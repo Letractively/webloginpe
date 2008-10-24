@@ -1,5 +1,5 @@
 #summary The parameters used in an WebLoginPE call.
-#labels Parameters,Phase-Deploy,Phase-Implementation
+#labels Phase-Deploy,Phase-Implementation
 
 = &lang =
 
@@ -35,4 +35,23 @@ There are two different types of registration...
 
 {{{
 [!WebLoginPE? &type=`register` &regType=`verify`!] 
+}}}
+
+= &regRequired =
+
+This parameter allows you to specify what inputs are required for registration. The attributes you choose *must* be filled out, else an error message will appear and notify the user of the field(s) that is/are not properly filled out.
+
+If you use verify/confirm form field, such as their password, add...
+{{{
+.confirm
+}}}
+to the end of the field you want to verify/confirm.
+
+{{{
+<input type="password" name="password" />
+<input type="password" name="password.confirm" />
+}}}
+
+{{{
+[!WebLoginPE? &type=`register` &regRequired=`email,username,fullname,password,formcode,tos`!]
 }}}
