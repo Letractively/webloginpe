@@ -1,5 +1,5 @@
 #summary Steps to perform a new install or upgrade of an existing install.
-#labels install,upgrade
+#labels Phase-Deploy
 
 ==*New Install*==
  # Upload *webloginpe* and all it's contents to */assets/snippets/* in your MODx installation.
