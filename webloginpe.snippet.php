@@ -16,7 +16,7 @@
 	$groups = isset($groups) ? $groups : '';
 	$groupsField = isset($groupsField) ? $groupsField : '';
 	$approvedDomains = isset($approvedDomains) ? $approvedDomains : '';
-    $pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
+  $pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
 	$regRequired = isset($regRequired) ? $regRequired : '';
 	$customTable = isset($customTable) ? $customTable : 'web_user_attributes_extended';
 	$customFields = isset($customFields) ? $customFields : '';
@@ -24,6 +24,7 @@
 	$lang = isset($lang) ? $lang : 'en';
 	$userImageSettings = isset($userImage) ? $userImage : '105000,100,100';
 	$dateFormat = isset($dateFormat) ? $dateFormat : '%A %B %d, %Y at %I:%M %p';
+	$dobFormat = isset($dobFormat) ? $dobFormat : '%m-%d-%Y'; // add by Bruno
 	$disableServices = isset($disableServices) ? explode(',', str_replace(', ',',',$disableServices)) : array();
 	$tableCheck = isset($tableCheck) ? $tableCheck : 1;
 	$paging = isset($paging) ? $paging : 3000;
@@ -43,6 +44,7 @@
 	
 	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging);
 	$wlpe->CustomTable($customTable, $customFields, $prefixTable, $tableCheck);
+	$wlpe->dobFormat = $dobFormat; // add by Bruno
 
 	$liHomeId = isset($liHomeId) ? explode(',', $liHomeId) : '';
 	$loHomeId = isset($loHomeId) ? $loHomeId : '';
