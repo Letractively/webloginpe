@@ -1,5 +1,5 @@
 #summary The parameters used in an WebLoginPE call.
-#labels Phase-Deploy,Phase-Support
+#labels Phase-Deploy,Phase-Support,Phase-Implementation
 
 = &lang =
 
@@ -54,4 +54,22 @@ to the end of the field you want to verify/confirm.
 
 {{{
 [!WebLoginPE? &type=`register` &regRequired=`email,username,fullname,password,formcode,tos`!]
+}}}
+
+= &customTable, &customFields =
+
+By default, a table is created in your MODx database to store the user's data under the name _web_user_attributes_extended_, but you can override this functionality with the *customTable* parameter.
+
+*customFields* is used for all the non-default attributes, such as their instant messaging accounts. This parameter can accept an unlimited amount of attributes.
+
+{{{
+[!WebLoginPE? &customTable=`my_web_users` &customFields=`website,aim,msn,city,address1`!] 
+}}}
+
+= &prefixTable =
+
+By default, WebLoginPE will auto-append the MODx table prefix specified when you installed the script when looking for data in the database. If you already created your own table which does not use the default MODx table prefix, and you specified it in _&customTable_, you can set this parameter to 0 (default is 1).
+
+{{{
+[!WebLoginPE? &customTable=`a_table_i_created` &prefixTable=`0`!] 
 }}}
