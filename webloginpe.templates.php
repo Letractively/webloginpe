@@ -2,7 +2,7 @@
 	
 	$wlpeDefaultFormTpl = '[+wlpe.message+]
 	<div id="wlpeLogin">
-		<form id="wlpeLoginForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeLoginForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeLoginFieldset">
 				<legend id="wlpeLegend">Web User Login Form</legend>
 				<label id="wlpeUsernameLabel" for="wlpeUsername">Username
@@ -45,7 +45,7 @@
 				[+user.comment+]
 			</blockquote>
 		</div>
-		<form id="wlpeUserForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeUserForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeUserButtons">
 				<button type="submit" id="wlpeLogoutButton" name="service" value="logout">Log Out</button>
 				<button type="submit" id="wlpeProfileButton" name="service" value="profile">Profile</button>
@@ -55,7 +55,7 @@
 	
 	$wlpeProfileTpl = '[+wlpe.message+]
 	<div id="wlpeUser">
-		<form enctype="multipart/form-data" id="wlpeUserProfileForm" action="[~[*id*]~]" method="POST">
+		<form enctype="multipart/form-data" id="wlpeUserProfileForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeUserProfileInput">
 				<div id="wlpeUserInfo">
 					<h3 id="wlpeProfileWelcome">Hello [+user.fullname+] ([+user.username+])!</h3>
@@ -138,7 +138,7 @@
 	
 	$wlpeProfileDeleteTpl = '[+wlpe.message+]
 	<div id="wlpeProfileDelete">
-		<form id="wlpeProfileDeleteForm" name="profileDelteForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeProfileDeleteForm" name="profileDelteForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeProfileDeleteFieldset">
 				<legend id="wlpeProfileDeleteFieldsetLegend">Delete Your Profile</legend>
 				<h1 id="wlpeProfileDeleteWarning" class="warning">WARNING!</h1>
@@ -154,7 +154,7 @@
 	
 	$wlpeActivateTpl = '[+wlpe.message+]
 	<div id="wlpeActivate">
-		<form id="wlpeActivateForm" name="wlpeActivateForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeActivateForm" name="wlpeActivateForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeActivateFieldset">
 				<input type="hidden" name="userid" value="[+request.userid+]" />
 				<input type="hidden" name="activationkey" value="[+request.activationkey+]" />
@@ -178,7 +178,7 @@
 	
 	$wlpeResetTpl = '[+wlpe.message+]
 	<div id="wlpeReset">
-		<form id="wlpeResetForm" name="wlpeResetForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeResetForm" name="wlpeResetForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeResetFieldset">
 				<h3 id="wlpeResetInfo">Don\'t Worry, it happens to everyone.</h3>
 				<p>Enter your email address in the field below and we will set a temporary password for your account.</p>
@@ -197,7 +197,7 @@
 	
 	$wlpeRegisterVerifyTpl = '[+wlpe.message+]
 	<div id="wlpeRegister">
-		<form id="wlpeRegisterForm" name="wlpeRegisterForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeRegisterForm" name="wlpeRegisterForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeRegisterFieldset">
 				<p class="wlpeRegisterInfo">Enter your email address, your name, and your desired username in the fields below.</p>
 				<p class="wlpeRegisterInfo">A password will be emailed to you with instructions on how to activate Your account.</p>
@@ -274,7 +274,7 @@
 		
 	$wlpeRegisterInstantTpl = '[+wlpe.message+]
 	<div id="wlpeNewUser">
-		<form id="wlpeUserRegisterForm" action="[~[*id*]~]" method="POST" enctype="multipart/form-data">
+		<form id="wlpeUserRegisterForm" action="[~[*id*]~]" method="post" enctype="multipart/form-data">
 			<fieldset id="wlpeUserRegisterInput">
 				<div id="wlpeNewUserInfo">
 					<p id="wlpeRegisterInfo">Use this form to register for a new user account.<br />
@@ -450,7 +450,7 @@
 	
 	$wlpeManageProfileTpl = '[+wlpe.message+]
 	<div id="wlpeUser">
-		<form enctype="multipart/form-data" id="wlpeUserProfileForm" action="[~[*id*]~]" method="POST">
+		<form enctype="multipart/form-data" id="wlpeUserProfileForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeUserProfileInput">
 				<div id="wlpeUserInfo">
 					<h3 id="wlpeProfileWelcome">Editing the profile of [+view.username+] ([+view.fullname+])!</h3>
@@ -534,7 +534,7 @@
 		</form>
 	</div>';
 	
-	$wlpeManageTpl = '<form class="wlpeManageUsersForm" action="[~[*id*]~]" method="POST">
+	$wlpeManageTpl = '<form class="wlpeManageUsersForm" action="[~[*id*]~]" method="post">
 		<div class="wlpeUserPage">
 			<div class="wlpeUserPagePhoto">
 				<img src="[+view.photo+]" alt="[+view.photo+]" title="[+view.username+]" height="100" width="100" />
@@ -558,7 +558,7 @@
 	
 	$wlpeManageDeleteTpl = '[+wlpe.message+]
 	<div id="wlpeProfileDelete">
-		<form id="wlpeProfileDeleteForm" name="profileDelteForm" action="[~[*id*]~]" method="POST">
+		<form id="wlpeProfileDeleteForm" name="profileDelteForm" action="[~[*id*]~]" method="post">
 			<fieldset id="wlpeProfileDeleteFieldset">
 				<legend id="wlpeProfileDeleteFieldsetLegend">Delete User Profile</legend>
 				<h1 id="wlpeProfileDeleteWarning" class="warning">WARNING!</h1>
