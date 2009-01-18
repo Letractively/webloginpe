@@ -151,7 +151,7 @@ class WebLoginPE
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000, $id='')
 	{
 		require_once 'manager/includes/controls/class.phpmailer.php';
 		$this->LanguageArray = $LanguageArray;
@@ -160,6 +160,7 @@ class WebLoginPE
 		$this->Type = $type;
 				//Added by Taff
 		$this->Pagination = $paging;
+		$this->WlpeId = $id;
 	}
 	
 	
@@ -168,10 +169,10 @@ class WebLoginPE
 	 *
 	 * @see __construct
 	 */
-		function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+		function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000, $id='')
 		{
 			if(substr(phpversion(),0,1) < 5){
-				$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+				$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging, $id);
 			}    
 		}
 	
@@ -192,7 +193,7 @@ class WebLoginPE
 		unset($this->Report);
 		$messageTemplate = str_replace('[+wlpe.message.text+]', $message, $this->MessageTemplate);
 		$this->Report = $messageTemplate;
-		$modx->setPlaceholder('wlpe.message', $messageTemplate);
+		$modx->setPlaceholder($this->WlpeId.'wlpe.message', $messageTemplate);
 		unset ($messageTemplate);
 		return;
 	}
@@ -221,7 +222,7 @@ class WebLoginPE
 			$this->FormatMessage($this->LanguageArray[5]);
 			return;
 		}
-		$_SESSION['groups'] = array('Registered Users', 'Fans');
+		//$_SESSION['groups'] = array('Registered Users', 'Fans');
 		$this->OnBeforeWebLogin();
 		$this->User = $this->QueryDbForUser($this->Username);
 
@@ -1233,7 +1234,7 @@ class WebLoginPE
 				}
 				else
 				{
-					$listOuterTemplate = $this->AddInstance($this->Template($listOuterTemplate),$id);
+					$listOuterTemplate = $this->AddId($this->Template($listOuterTemplate),$id);
 				}
 				//return $listOuterTemplate;
 				
@@ -1244,7 +1245,7 @@ class WebLoginPE
 				}
 				else
 				{
-					$listTemplate = $this->AddInstance($this->Template($listTemplate),$id);
+					$listTemplate = $this->AddId($this->Template($listTemplate),$id);
 				}
 				
 				$listSortBy = $format[3];
@@ -3306,16 +3307,16 @@ class WebLoginPE
 		$modx->invokeEvent('OnWebLogout', $parameters);
 	}
 	
-	function AddInstance($toTpl,$id)
+	function AddId($toTpl,$id)
 	{
 		if($id) {
-			$toTpl = str_replace('</form>', '<input type="hidden" name="wlpeID" value="'.$id.'" /></form>', $toTpl);
-			$toTpl = str_replace('service=', 'wlpeID='.$id.'&service=', $toTpl);
+			$toTpl = str_replace('</form>', '<div><input type="hidden" name="wlpeID" value="'.$id.'" /></div></form>', $toTpl);
+			$toTpl = str_replace('service=', 'wlpeID='.$id.'&amp;service=', $toTpl);
+			$toTpl = str_replace('[+wlpe', '[+'.$id.'wlpe', $toTpl);
 		}
 		return $toTpl;
 	}
 
-	
 }
 // end WebLoginPE Class
 
