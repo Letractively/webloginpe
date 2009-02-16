@@ -1182,7 +1182,7 @@ class WebLoginPE
 	 * @return string HTML block containing all the users
 	 * @author Scotty Delicious
 	 */
-	function ViewAllUsers($userTemplate, $outerTemplate, $listUsers, $id)
+	function ViewAllUsers($userTemplate, $outerTemplate, $listUsers)
 	{
 		global $modx;
 		
