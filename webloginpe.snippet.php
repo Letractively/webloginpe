@@ -20,14 +20,14 @@
 		$service = $_REQUEST['serviceButtonValue'];
 	}
 
-	$id = isset($id) ? $id: '';
 	$req_id = $_REQUEST['wlpeID'] ? $_REQUEST['wlpeID'] : '';
 	$hide = isset($hide) ? $hide : 0; // or 1 if you prefer to hide as default ;)
-	if ($service && $id !== $req_id) 
+	if ($service && $id && $id !== $req_id)
 	{
 		if ($hide) return; // skip this instance
 		$service=''; // run this instance without mess
 	}
+	$id = isset($id) ? $id: '';
 
 	$type = isset($type) ? $type : 'simple';
 	$regType = isset($regType) ? $regType : 'instant';
