@@ -2,6 +2,7 @@
 	/**
 	 * WebLoginPE Snippet 1.3.2 Beta 1
 	 * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
+	 * v1.3.2 config, stylesheet and lang array modifications by sottwell August 2009
 	 *
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
@@ -9,6 +10,12 @@
 	 *
 	 * See the "docs" folder for detailed usage and parameter instructions.
 	 */
+	 
+    // Allow use of a config file
+    $config = isset($config) ? $config : 'default';
+    if(file_exists(MODX_BASE_PATH . 'assets/snippets/webloginpe/configs/' . $config . '.config.php')) {
+        include MODX_BASE_PATH . 'assets/snippets/webloginpe/configs/' . $config . '.config.php';
+    }
 
 	$type = isset($type) ? $type : 'simple';
 	$regType = isset($regType) ? $regType : 'instant';
@@ -38,7 +45,7 @@
 	else
 	{
 		include_once MODX_BASE_PATH.'assets/snippets/webloginpe/lang/en.php';
-		$modx->setPlaceholder('wlpe.message', $wlpe_lang[105]);
+		$modx->setPlaceholder('wlpe.message', $wlpe_lang['bad_langfile']);
 		print '[+wlpe.message+]';
 	}
 	
@@ -97,6 +104,10 @@
 	else if (!empty($customJs))
 	{
 		$modx->regClientStartupScript($customJs);
+	}
+	
+	if(isset($customCSS)) {
+	   $modx->regClientCss($customCSS);
 	}
 	
 	$wlpe->ActiveUsers();
@@ -412,8 +423,8 @@
                 // Here we check for an error, then reload the activation template if necessary
                 // Do NOT reload if wlpe->Report indicates success
                  // Added strip_tags() around string which means an error is not thrown regarding a modifier from closing
-                // html tag e.g. if $wlpe_lang[104] contains "</div>" this will fail as "/d" treated as modifier
-                if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang[104])."/i", $wlpe->Report ) )
+                // html tag e.g. if $wlpe_lang[new_password_activated] contains "</div>" this will fail as "/d" treated as modifier
+                if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang['new_password_activated'])."/i", $wlpe->Report ) )
                 {
                     return $displayActivateTpl;
                 }                
