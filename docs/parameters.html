@@ -34,6 +34,30 @@
 		<div id="content">
 			<h4>Control Parameters</h4>
 			<div id="paramList1">
+
+				<div class="parameter">
+					<h5>&amp;config</h5>
+					<p class="details">
+					Specify a configuration file for defining WebLoginPE configuration parameters. This file must reside in the assets/snippets/weblogin/configs/ directory, and have a filename like register.config.php. This file is a standard PHP file, and the parameters are defined as normal PHP variables.</p>
+					<pre>
+    &lt;?php
+    // config file for wlpe in register mode
+    $type = 'register';
+    // required form fields
+    $regRequired = 'email,username,password';
+    // custom database fields
+    $customTable = 'client_attributes';
+    $customFields = 'firstname,lastname,companyname';
+    $groups = 'clients';
+    $notify = 'me@mydomain.com,partner@partnerdomain.com';
+    // templates - can be chunk name, path to a file, or the entire template as a string
+    $registerSuccessTpl = '&lt;p>Registration successful. You will be contacted.&lt;/p>';
+                    </pre>
+
+					<div class="example">
+						[!WebLoginPE?config=`register`!]
+					</div>
+				</div>
 				
 				<div class="parameter">
 					<h5>&amp;lang</h5>
@@ -237,6 +261,15 @@
 					</p>
 					<div class="example">
 						[!WebLoginPE? &amp;loadJquery=`true`!]
+					</div>
+				</div>
+
+				<div class="parameter">
+					<h5>&amp;customCSS</h5>
+					<p class="details">
+						The URL to the custom CSS file you would like to have added to the document head.</p>
+					<div class="example">
+						[!WebLoginPE? &amp;customCSS=`assets/snippets/webloginpe/wlpe.css`!]
 					</div>
 				</div>
 				
