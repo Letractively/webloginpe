@@ -2,7 +2,6 @@
 /**
  * WebLoginPE
  * A progressively enhanced (PE) user management and login snippet for MODx
- * v1.3.2 Beta 1
  * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
  *
  * @package WebLoginPE
@@ -138,31 +137,19 @@ class WebLoginPE
 	var $DateFormat;
 	
 	/**
-	 * Number of items listed on one page
-	 *
-	 * @var number
-	 */
-	var $paging;
-	
-	/**
 	 * WebLoginPE Class Constructor
 	 *
 	 * @param array $LanguageArray An array of language specific strings.
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple')
 	{
 		require_once 'manager/includes/controls/class.phpmailer.php';
 		$this->LanguageArray = $LanguageArray;
 		$this->DateFormat = $dateFormat;
 		$this->UserImageSettings = $UserImageSettings;
 		$this->Type = $type;
-                //Added by Taff
-		$this->Pagination = $paging;
-		            //Added by Jako
-		if (isset($this->LanguageArray[43]))
-      setlocale ( LC_TIME, $this->LanguageArray[43] );
 	}
 	
 	
@@ -171,12 +158,10 @@ class WebLoginPE
 	 *
 	 * @see __construct
 	 */
-    	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
-    	{
-            if(substr(phpversion(),0,1) < 5){
-    		    $this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
-    	    }    
-        }
+	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple')
+	{
+		$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type);
+	}
 	
 	
 	/**
@@ -221,7 +206,7 @@ class WebLoginPE
 		$this->Password = $modx->db->escape(strip_tags($_POST['password']));
 		if ($this->Username == '' || $this->Password == '')
 		{
-			$this->FormatMessage($this->LanguageArray[5]);
+			$this->FormatMessage($this->LanguageArray['required_blank']);
 			return;
 		}
 		$_SESSION['groups'] = array('Registered Users', 'Fans');
@@ -230,7 +215,7 @@ class WebLoginPE
 
 		if ($this->User == false)
 		{
-			$this->FormatMessage($this->LanguageArray[21]);
+			$this->FormatMessage($this->LanguageArray['bad_username']);
 			return;
 		}
 		
@@ -417,7 +402,7 @@ class WebLoginPE
 	 * @author Raymond Irving
 	 * @author Scotty Delicious
 	 */
-	function Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject, $approvedDomains='',$pendingGroups='')
+	function Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject)
 	{
 		global $modx;
 		
@@ -444,9 +429,9 @@ class WebLoginPE
 		$cachepwd = time();
 		
 		// Check for required fields.
-        if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['username']) == '' ) // pixelchutes
+if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['username']) == '' ) // pixelchutes
 		{			
-			return $this->FormatMessage($this->LanguageArray[0]);
+			return $this->FormatMessage($this->LanguageArray['required_blank']);
 		}
 		if ( strlen($_POST['email']) > 0 ) // pixelchutes
 		{
@@ -467,7 +452,7 @@ class WebLoginPE
 					$formcode = $_POST['formcode'];
 					if ($_SESSION['veriword'] !== $formcode)
 					{
-						return $this->FormatMessage($this->LanguageArray[6]);
+						return $this->FormatMessage($this->LanguageArray['bad_code']);
 					}
 				}
 				
@@ -485,25 +470,25 @@ class WebLoginPE
 				{
 					if ($field == 'tos')
 					{
-						return $this->FormatMessage($this->LanguageArray[34]);
+						return $this->FormatMessage($this->LanguageArray['TOS']);
 					}
 					
-					return $this->FormatMessage($this->LanguageArray[0]);
+					return $this->FormatMessage($this->LanguageArray['required_blank']);
 				}
 			}
 		}
 		
-		// Check username for bullshit.
+		// Check username for invalid characters.
 		$illegals = array('\\','\''); 
 		if (strlen(str_replace($illegals, '', $username)) !== strlen($username))
 		{
-			return $this->FormatMessage($this->LanguageArray[32]);
+			return $this->FormatMessage($this->LanguageArray['illegal username']);
 		}
 		
 		// Check username length 
 		if (strlen($username) > 100)
 		{
-			return $this->FormatMessage($this->LanguageArray[1]);
+			return $this->FormatMessage($this->LanguageArray['long_username']);
 		}
 		
 		// Check for arrays and that "confirm" fields match.
@@ -519,7 +504,7 @@ class WebLoginPE
 			{
 				if ($_POST[$field] !== $_POST[$confirm])
 				{
-					$error = $this->LanguageArray[2].' <br />';
+					$error = $this->LanguageArray['mismatched_fields'].' <br />';
 					$fieldMessage .= str_replace('[+000+]', '"'.$field.'"', $error);
 				}
 			}
@@ -538,17 +523,17 @@ class WebLoginPE
 		{
 			if (strlen($password) < 6)
 			{
-				return $this->FormatMessage($this->LanguageArray[3]);
+				return $this->FormatMessage($this->LanguageArray['short_password']);
 			}
 			
 			if (empty($password) || $password == '')
 			{
-				return $this->FormatMessage($this->LanguageArray[3]);
+				return $this->FormatMessage($this->LanguageArray['short_password']);
 			}
 			
 			if (md5($password) !== md5($_POST['password']))
 			{
-				return $this->FormatMessage($this->LanguageArray[4]);
+				return $this->FormatMessage($this->LanguageArray['illegal_password']);
 			}
 		}
 		
@@ -557,13 +542,13 @@ class WebLoginPE
 		
 		if ($limit > 0)
 		{
-			return $this->FormatMessage($this->LanguageArray[7]);
+			return $this->FormatMessage($this->LanguageArray['username_used']);
 		}
 		
 		$lowercase = strtolower(str_replace(' ', '_', $username));
 		if ($lowercase == 'default_user')
 		{
-			return $this->FormatMessage($this->LanguageArray[7]);
+			return $this->FormatMessage($this->LanguageArray['username_used']);
 		}
 		
 		$checkEmail = $modx->db->query("SELECT * FROM ".$web_user_attributes." WHERE `email`='".$email."'");
@@ -571,11 +556,11 @@ class WebLoginPE
 		
 		if ($limit > 0)
 		{
-			return $this->FormatMessage($this->LanguageArray[8]);
+			return $this->FormatMessage($this->LanguageArray['email_used']);
 		}
 		
 		// If you want to verify your users email address before letting them log in, this generates a random password.
-		if ($regType == 'verify' || $regType == 'pending')
+		if ($regType == 'verify')
 		{
 			$password = $this->GeneratePassword(10);
 		}
@@ -601,13 +586,13 @@ class WebLoginPE
 		}
 		$this->OnBeforeWebSaveUser($NewUser, array());
 		
-		// If all that crap checks out, now we can create the account.
+		// If everything checks out, now we can create the account.
 		$newUser = "INSERT INTO ".$web_users." (`username`, `password`, `cachepwd`) VALUES ('".$username."', '".md5($password)."', '".$cachepwd."')";
 		$createNewUser = $modx->db->query($newUser);
 		
 		if (!$createNewUser)
 		{
-			return $this->FormatMessage($this->LanguageArray[9]);
+			return $this->FormatMessage($this->LanguageArray['register_error']);
 		} 
 		
 		$key = $modx->db->getInsertId();
@@ -620,7 +605,7 @@ class WebLoginPE
 				
 		if (!$insertUserAttr)
 		{
-			return $this->FormatMessage($this->LanguageArray[10]);
+			return $this->FormatMessage($this->LanguageArray['save_error']);
 		}
 		
 		if (!empty($this->CustomFields) && $this->CustomFields !== '')
@@ -637,30 +622,10 @@ class WebLoginPE
 		
 			if (!$insertExtendedAttr)
 			{
-				return $this->FormatMessage($this->LanguageArray[10]);
+				return $this->FormatMessage($this->LanguageArray['save_error']);
 			}
 		}
 		
-		// Set group to pending
-		if ($regType == 'pending') {
-			$groups = $pendingGroups;
-		}
-
-		// Set group for auto approved domains
-		if(!empty($approvedDomains)){
-			$domainSets = split("\|\|",$approvedDomains);
-			$userEmail = split("@",$email);
-			foreach($domainSets as $set){
-				$set = split(":",$set);
-				$domains = split(",",$set[0]);
-				$group = $set[1];
-				if (in_array($userEmail[1], $domains)) {
-				    $groups = $group;
-					$regType = 'verify';
-				}				
-			}
-		}
-
 		$groups = str_replace(', ', ',', $groups);
 		$GLOBALS['groupsArray'] = explode(',', $groups);
 		
@@ -672,7 +637,7 @@ class WebLoginPE
 			$groupNames = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` IN (".$groupsList.")");
 			if (!$groupNames)
 			{
-				return $this->FormatMessage($this->LanguageArray[11]);
+				return $this->FormatMessage($this->LanguageArray['groups_error']);
 			}
 			else
 			{
@@ -687,45 +652,42 @@ class WebLoginPE
 		// EVENT: OnWebSaveUser
 		$this->OnWebSaveUser('new', $NewUser);
 		
-		if ($regType != 'pending') {
-    		// Replace some placeholders in the Config websignupemail message.
-    		$messageTpl = $modx->config['websignupemail_message'];
-    		$myEmail = $modx->config['emailsender'];
-            $emailSubject = $modx->config['emailsubject'];
-    		$siteName = $modx->config['site_name'];
-    		$siteURL = $modx->config['site_url'];
-    		
-    		$message = str_replace('[+uid+]', $username, $messageTpl);
-            $message = str_replace('[+pwd+]', $password, $message);
-            $message = str_replace('[+ufn+]', $fullname, $message);
-            $message = str_replace('[+sname+]', $siteName, $message);
-            $message = str_replace('[+semail+]', $myEmail, $message);
-            $message = str_replace('[+surl+]', $siteURL, $message);
-    		foreach ($_POST as $name => $value)
-    		{
-    			$toReplace = '[+post.'.$name.'+]';
-    			$message = str_replace($toReplace, $value, $message);
-    		}
-    
-    		// Bring in php mailer!
-    		$Register = new PHPMailer();
-    		$Register->CharSet = $modx->config['modx_charset'];
-    		$Register->From = $myEmail;
-    		$Register->FromName = $siteName;
-    		$Register->Subject = $emailSubject;
-    		$Register->Body = $message;
-    		$Register->AddAddress($email, $fullname);
-    		
-    		if (!$Register->Send())
-    		{
-    			return $this->FormatMessage($this->LanguageArray[12]);
-    		}
+		// Replace some placeholders in the Config websignupemail message.
+		$messageTpl = $modx->config['websignupemail_message'];
+		$myEmail = $modx->config['emailsender'];
+        $emailSubject = $modx->config['emailsubject'];
+		$siteName = $modx->config['site_name'];
+		$siteURL = $modx->config['site_url'];
+		
+		$message = str_replace('[+uid+]', $username, $messageTpl);
+        $message = str_replace('[+pwd+]', $password, $message);
+        $message = str_replace('[+ufn+]', $fullname, $message);
+        $message = str_replace('[+sname+]', $siteName, $message);
+        $message = str_replace('[+semail+]', $myEmail, $message);
+        $message = str_replace('[+surl+]', $siteURL, $message);
+		foreach ($_POST as $name => $value)
+		{
+			$toReplace = '[+post.'.$name.'+]';
+			$message = str_replace($toReplace, $value, $message);
+		}
+
+		// Bring in php mailer!
+		$Register = new PHPMailer();
+		$Register->CharSet = $modx->config['modx_charset'];
+		$Register->From = $myEmail;
+		$Register->FromName = $siteName;
+		$Register->Subject = $emailSubject;
+		$Register->Body = $message;
+		$Register->AddAddress($email, $fullname);
+		
+		if (!$Register->Send())
+		{
+			return $this->FormatMessage($this->LanguageArray['email_error']);
 		}
 		
 		// Add the list of administrators to be notified on new registration to a Blind Carbon Copy.
 		if (isset($notify) && $notify !== '')
 		{
-            $notify = ($notify == 'default' ? $modx->config['emailsender'] : $notify);
 			$emailList = str_replace(', ', ',', $notify);
 			$emailArray = explode(',', $emailList);
 			
@@ -740,8 +702,6 @@ class WebLoginPE
 				$toReplace = '[+post.'.$name.'+]';
 				$notification = str_replace($toReplace, $value, $notification);
 			}
-			// Cleanup any unused placeholders
-			$notification = ereg_replace('\[\+post\.+[a-zA-Z]+\+\]', '', $notification);
 			
 			$Notify = new PHPMailer();
 			$Notify->CharSet = $modx->config['modx_charset'];
@@ -761,7 +721,7 @@ class WebLoginPE
 			}
 		}
 		$this->SessionHandler('destroy');
-		$this->FormatMessage($this->LanguageArray[100].$modx->config['site_name']);
+		$this->FormatMessage($this->LanguageArray['check_email_new_account'].$modx->config['site_name']);
 		return 'success';
 	}
 	
@@ -793,7 +753,7 @@ class WebLoginPE
 				$deleteFromGroups = $modx->db->query("DELETE FROM ".$web_groups." WHERE `webuser`='".$user['id']."'");
 				
 				// Email the Web Master regarding pruned accounts.
-				$prunedMessage = str_replace('[+000+]', $user['username'], $this->LanguageArray[36]);
+				$prunedMessage = str_replace('[+000+]', $user['username'], $this->LanguageArray['pruned_message']);
 				$prunedMessage = str_replace('[+111+]', strftime('%A %B %d, %Y', $user['cachepwd']), $prunedMessage);
 				$emailsender = $modx->config['emailsender'];
 				
@@ -801,7 +761,7 @@ class WebLoginPE
 				$Pruned->CharSet = $modx->config['modx_charset'];
 				$Pruned->From = $modx->config['emailsender'];
 				$Pruned->FromName = 'WebLoginPE Pruning Agent';
-				$Pruned->Subject = $this->LanguageArray[35];
+				$Pruned->Subject = $this->LanguageArray['pruned_subject'];
 				$Pruned->Body = $prunedMessage;
 				$Pruned->AddAddress($emailsender);
 				if (!$Pruned->Send())
@@ -852,7 +812,7 @@ class WebLoginPE
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function SaveUserProfile($internalKey = '',$groups = '',$activate = false, $activateId = '',$activateConfig='',$activatePost='')
+	function SaveUserProfile($internalKey = '')
 	{
 		global $modx;
 		if ($internalKey == '' || empty($internalKey))
@@ -869,8 +829,6 @@ class WebLoginPE
 		
 		$web_users = $modx->getFullTableName('web_users');
 		$web_user_attributes = $modx->getFullTableName('web_user_attributes');
-		$web_groups = $modx->getFullTableName('web_groups');
-		$webgroup_names = $modx->getFullTableName('webgroup_names');
 		
 		// EVENT: OnBeforeWebSaveUser
 		$this->OnBeforeWebSaveUser(array(), array()); // pixelchutes
@@ -889,19 +847,19 @@ class WebLoginPE
 					}
 					else
 					{
-						$this->FormatMessage($this->LanguageArray[3]);
+						$this->FormatMessage($this->LanguageArray['short_password']);
 						return;
 					}
 				}
 				else
 				{
-					$this->FormatMessage($this->LanguageArray[4]);
+					$this->FormatMessage($this->LanguageArray['illegal_password']);
 					return;
 				}
 			}
 			else
 			{
-				$this->FormatMessage($this->LanguageArray[2]);
+				$this->FormatMessage($this->LanguageArray['mismatched_fields']);
 				return;
 			}
 		}
@@ -919,7 +877,7 @@ class WebLoginPE
 			{
 				if ($_POST[$field] !== $_POST[$confirm])
 				{
-					$error = $this->LanguageArray[2].' <br />';
+					$error = $this->LanguageArray['mismatched_fields'].' <br />';
 					$fieldMessage .= str_replace('[+000+]', '"'.$field.'"', $error);
 				}
 			}
@@ -955,11 +913,11 @@ class WebLoginPE
 				$_POST['dob'] = $this->MakeDateForDb($_POST['dob']);
 			}
 			if ($field!='photo' || ($_FILES['photo']['name'] !== '' && !empty($_FILES['photo']['name']))) // for update db with value and blank value (except if the field is 'photo')
-			{
-				// CREDIT: Mike Reid (aka Pixelchutes) for the string escape code.
-				$charset=$modx->config['modx_charset'];
-				$generalElementsUpdate[] = " `".$field."` = '".$modx->db->escape(stripslashes(htmlentities(trim($_POST[$field]), ENT_QUOTES, $modx->config['modx_charset']))).	"'";
-			}
+{
+	// CREDIT: Mike Reid (aka Pixelchutes) for the string escape code.
+	$charset='"'.$modx->config['modx_charset'].'"';
+	$generalElementsUpdate[] = " `".$field."` = '".$modx->db->escape(stripslashes(htmlentities(trim($_POST[$field]), ENT_QUOTES, $modx->config['modx_charset'])))."'";
+}
 		}
 		
 		if (!empty($this->CustomFields) && $this->CustomFields !== '')
@@ -999,113 +957,6 @@ class WebLoginPE
 		// Prepare the query for General Elements
 		$generalElementsSQL = "UPDATE ".$web_user_attributes." SET ".implode(', ', $generalElementsUpdate)." WHERE `internalkey` = '".$internalKey."'";
 		
-		// Set custom configuration of activation
-		if($activate && !empty($activateConfig) && !empty($activatePost)){
-		    // FORMAT: activationType:groups:template:emailSubject|activationType:groups:template:emailSubject
-			$activateGroups = split("\|",$activateConfig);
-            foreach($activateGroups as $activateGroup){
-                $typeConfig = split(":",$activateGroup);
-                if($_POST[$activatePost] == $typeConfig[0]){
-                    $groups = $typeConfig[1];
-                    $messageTpl = $this->Template($typeConfig[2]);
-                    $emailSubject = (isset($typeConfig[3]) ? $typeConfig[3]:"");
-                    break;      
-                }
-            }
-		}
-		
-		// Update webuser groups
-		if(!empty($groups)){
-			// Flush existing group settings 
-			$deleteFromGroups = $modx->db->query("DELETE FROM ".$web_groups." WHERE `webuser`='".$internalKey."'");
-
-			$groups = str_replace(', ', ',', $groups);
-			$GLOBALS['groupsArray'] = explode(',', $groups);
-		
-			// EVENT: OnBeforeAddToGroup
-			$this->OnBeforeAddToGroup($GLOBALS['groupsArray']);
-			if (count($groupArray > 0))
-			{
-				$groupsList = "'".implode("','", $GLOBALS['groupsArray'])."'";			
-				$groupNames = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` IN (".$groupsList.")");
-				if (!$groupNames)
-				{
-					return $this->FormatMessage($this->LanguageArray[11]);
-				}
-				else
-				{
-					while ($row = $modx->db->getRow($groupNames))
-					{
-						$webGroupId = $row['id'];
-						$modx->db->query("REPLACE INTO ".$web_groups." (`webgroup`, `webuser`) VALUES ('".$webGroupId."', '".$internalKey."')");
-					}
-				}
-			}			
-		}
-		
-		// Send activation e-mail to user if approved
-		if ($activate) {
-			$findUser = "SELECT * FROM ".$web_user_attributes.", ".$web_users." WHERE ".$web_users.".`id`='".$internalKey."' AND ".$web_user_attributes.".`internalKey`=".$web_users.".`id`";
-			$userInfo = $modx->db->query($findUser);
-			$limit = $modx->recordCount($userInfo);	
-			if ($limit == 1){
-				// Generate new password
-				$newPassword = $this->GeneratePassword(10);
-				$newPasswordKey = $this->GeneratePassword(10);
-				$this->User = $modx->db->getRow($userInfo);
-				$insertNewPassword = "UPDATE ".$web_users." SET cachepwd='".$newPassword."|".$newPasswordKey."' WHERE id='".$this->User['internalKey']."'";
-				$setCachePassword = $modx->db->query($insertNewPassword);
-				
-				// build activation url
-            	$activateId = (!empty($activateId) ? $activateId : $modx->documentIdentifier);
-	            if($_SERVER['SERVER_PORT']!='80'){
-					$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
-				}else{
-					$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
-					//$url = $_SERVER['HTTP_REFERER']."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey;
-	            }
-
-				// Replace some placeholders in the Config websignupemail message.
-				if(empty($messageTpl)){
-				    $messageTpl = $modx->config['webpwdreminder_message'];				    
-				}
-				if(empty($emailSubject)){
-				    $emailSubject = $modx->config['emailsubject'];
-				}
-				$myEmail = $modx->config['emailsender'];
-				$siteName = $modx->config['site_name'];
-				$siteURL = $modx->config['site_url'];				
-
-				$message = str_replace("[+uid+]", $this->User['username'], $messageTpl);
-	            $message = str_replace("[+pwd+]", $newPassword, $message);
-	            $message = str_replace("[+ufn+]", $this->User['fullname'], $message);
-	            $message = str_replace("[+sname+]", $siteName, $message);
-	            $message = str_replace("[+semail+]", $myEmail, $message);
-	            $message = str_replace("[+surl+]", $url, $message);
-
-				foreach ($_POST as $name => $value){
-					$toReplace = '[+post.'.$name.'+]';
-					$message = str_replace($toReplace, $value, $message);
-				}
-
-
-				// Bring in php mailer!
-				$Register = new PHPMailer();
-				$Register->CharSet = $modx->config['modx_charset'];
-				$Register->From = $myEmail;
-				$Register->FromName = $siteName;
-				$Register->Subject = $emailSubject;
-				$Register->Body = $message;
-				$Register->AddAddress($this->User['email'], $this->User['fullname']);
-				
-				if (!$Register->Send())
-				{
-					return $this->FormatMessage($this->LanguageArray[12]);
-				}
-			}	
-		}
-		
-
 		// Execute the database queries.
 		if( count($generalElementsUpdate) > 0 ) $saveMyProfile = $modx->db->query($generalElementsSQL);
 		if (!empty($this->CustomFields) && $this->CustomFields !== '')
@@ -1121,7 +972,7 @@ class WebLoginPE
 			$this->SessionHandler('start');
 		}
 		
-		$this->FormatMessage($this->LanguageArray[101]);
+		$this->FormatMessage($this->LanguageArray['profile_updated']);
 	}
 	
 	
@@ -1142,7 +993,7 @@ class WebLoginPE
 		
 		if (!$deleteUser || !$deleteAttributes || !$deleteFromGroups || !$deleteFromActiveUsers)
 		{
-			return $this->FormatMessage($this->LanguageArray[13]);
+			return $this->FormatMessage($this->LanguageArray['delete_error']);
 		}
 		$this->OnWebDeleteUser($internalKey, $deleteUser['username']);
 		return;
@@ -1164,7 +1015,7 @@ class WebLoginPE
 		$internalKey = $currentWebUser['internalKey'];
 		$this->RemoveProfile($internalKey);
 		$this->SessionHandler('destroy');
-		$this->FormatMessage($this->LanguageArray[102]);
+		$this->FormatMessage($this->LanguageArray['profile_deleted']);
 		return;
 	}
 	
@@ -1172,7 +1023,7 @@ class WebLoginPE
 	function RemoveUserProfileManager($internalKey)
 	{
 		$this->RemoveProfile($internalKey);
-		$this->FormatMessage($this->LanguageArray[102]);
+		$this->FormatMessage($this->LanguageArray['profile_deleted']);
 		return;
 	}
 	
@@ -1188,32 +1039,8 @@ class WebLoginPE
 	{
 		global $modx;
 		
-		$positionInList =trim($_REQUEST['pag']);
-		if(!is_numeric($positionInList)){
-			$positionInList=0;
-		}
-		$numRows = "SELECT count(*) FROM ".$web_users;
 		$web_users = $modx->getFullTableName('web_users');
-		$allRows = $modx->db->query("SELECT id FROM ".$web_users);
-		$alumni = mysql_num_rows($allRows);
-		$pagination = $this->Pagination;
-		$num_rows = ceil($alumni/$pagination);
-		
-		if($num_rows > 1){
-			for($i=1;$i<=$num_rows;$i++){
-				$startPos = ($i*$pagination) - $pagination;
-				if($startPos !=$positionInList){
-				$output.=" <a href=\"index.php?id=".$modx->documentIdentifier."&pag=".$startPos."\">".$i."</a>";
-				}
-				else{
-				$output.=" ".$i;
-				}
-			}			
-		}
-		echo $output;
-		$fetchUsers = $modx->db->query("SELECT `username` FROM ".$web_users."ORDER BY `username` LIMIT ".$positionInList.",".$pagination);
-
-
+		$fetchUsers = $modx->db->query("SELECT `username` FROM ".$web_users);
 		$allUsers = $this->FetchAll($fetchUsers);
 		
 		if ($listUsers == '')
@@ -1295,8 +1122,8 @@ class WebLoginPE
 					
 					foreach ($CompleteUserList as $theUser)
 					{
-						switch($filterBy){
-							case 'webgroup':
+						if ($filterBy == 'webgroup')
+						{
 							$web_groups = $modx->getFullTableName('web_groups');
 							$webgroup_names = $modx->getFullTableName('webgroup_names');
 							$findWebGroup = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` = '".$filterValue."'");
@@ -1316,9 +1143,9 @@ class WebLoginPE
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-								break;
-
-							case 'online':
+						}
+						else if ($filterBy == 'online')
+						{
 							$active_users = $modx->getFullTableName('active_users');
 							$activityCheck = "SELECT * FROM ".$active_users." WHERE `internalKey` = '-".$theUser['internalKey']."'";
 							$lastActive = $modx->db->query($activityCheck);
@@ -1341,9 +1168,11 @@ class WebLoginPE
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-								break;					
-
-							default:
+						}
+						else
+						{
+							foreach ($theUser as $attribute => $value)
+							{
 								if (empty($theUser[$filterBy]) || $theUser[$filterBy] == '' && $filterBy !== 'webgroup')
 								{
 									$username = $theUser['username'];
@@ -1363,11 +1192,10 @@ class WebLoginPE
 										}
 									}
 								}
-								break;	
 							}
 						}
 					}
-
+				}
 				// SORT ARRAY
 				$sortArray = array();
 			    foreach($CompleteUserList as $username => $attributes)
@@ -1396,16 +1224,16 @@ class WebLoginPE
 							$userStatus = $modx->db->getRow($lastActive);
 							if ($userStatus['lasthit'] >= time() - (60 * 30))
 							{
-								$user['status'] = $this->LanguageArray[41];
+								$user['status'] = $this->LanguageArray['online'];
 							}
 							else
 							{
-								$user['status'] = $this->LanguageArray[42];
+								$user['status'] = $this->LanguageArray['offline'];
 							}
 						}
 						else
 						{
-							$user['status'] = $this->LanguageArray[42];
+							$user['status'] = $this->LanguageArray['offline'];
 						}
 
 						$eachProfile = $listTemplate;
@@ -1424,7 +1252,7 @@ class WebLoginPE
 							{
 								if ($value == 0)
 								{
-									$value = $this->LanguageArray[33];
+									$value = $this->LanguageArray['unknown'];
 									$eachProfile = str_replace('[+view.age+]', $value, $eachProfile);
 								}
 								else
@@ -1439,7 +1267,7 @@ class WebLoginPE
 							{
 								if ($value == 0)
 								{
-									$value = $this->LanguageArray[33];
+									$value = $this->LanguageArray['unknown'];
 								}
 								else
 								{
@@ -1459,7 +1287,6 @@ class WebLoginPE
 				$FinalDisplay .= $CombinedList;
 			}
 		}
-		$FinalDisplay = (empty($FinalDisplay)?"<p>No results.</p>":$FinalDisplay);
 		return $FinalDisplay;
 	}
 	
@@ -1502,16 +1329,16 @@ class WebLoginPE
 			$userStatus = $modx->db->getRow($lastActive);
 			if ($userStatus['lasthit'] >= time() - (60 * 30))
 			{
-				$viewUser['status'] = $this->LanguageArray[41];
+				$viewUser['status'] = $this->LanguageArray['online'];
 			}
 			else
 			{
-				$viewUser['status'] = $this->LanguageArray[42];
+				$viewUser['status'] = $this->LanguageArray['offline'];
 			}
 		}
 		else
 		{
-			$viewUser['status'] = $this->LanguageArray[42];
+			$viewUser['status'] = $this->LanguageArray['offline'];
 		}
 		
 		foreach ($viewUser as $column => $setting)
@@ -1531,19 +1358,19 @@ class WebLoginPE
 				{
 					if ($this->Type !== 'manager')
 					{
-						$modx->setPlaceholder('view.dob', $this->LanguageArray[33]);
+						$modx->setPlaceholder('view.dob', $this->LanguageArray['unknown']);
 					}
 					else
 					{
 						$modx->setPlaceholder('view.dob', '');
 					}
-					$modx->setPlaceholder('view.age', $this->LanguageArray[33]);
+					$modx->setPlaceholder('view.age', $this->LanguageArray['unknown']);
 				}
 				else
 				{
 					$ageDecimal = ((time() - $setting) / (60 * 60 * 24 * 365));
 					$age = substr($ageDecimal, 0, strpos($ageDecimal, "."));
-					$modx->setPlaceholder('view.dob', strftime($this->dobFormat, $viewUser['dob'])); // dobFormat by Bruno
+					$modx->setPlaceholder('view.dob', strftime('%m-%d-%Y', $viewUser['dob']));
 					$modx->setPlaceholder('view.age', $age);
 				}
 			}
@@ -1564,8 +1391,8 @@ class WebLoginPE
 					if ($setting == 'on')
 					{
 						$fieldToReplace = str_replace('private', '', $column);
-						$viewUser[$fieldToReplace] = $this->LanguageArray[38];
-						$modx->setPlaceholder('view.'.$fieldToReplace, $this->LanguageArray[38]);
+						$viewUser[$fieldToReplace] = $this->LanguageArray['private'];
+						$modx->setPlaceholder('view.'.$fieldToReplace, $this->LanguageArray['private']);
 					}
 				}// end private
 			}
@@ -1575,8 +1402,8 @@ class WebLoginPE
 		
 		// Handle Special input placeholders.
 		include 'assets/snippets/webloginpe/Default Forms/countryCodes.php';
-		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes);
-		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes);
+		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray['country'], $countryCodes);
+		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray['gender'], $genderCodes);
 
 		foreach ($inputHandler as $value)
 		{
@@ -1590,7 +1417,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -1653,7 +1480,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -1685,7 +1512,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
@@ -1735,7 +1562,7 @@ class WebLoginPE
 		
 		if (empty($subject) || $subject == '' || empty($message) || $message == '')
 		{
-			$this->FormatMessage($this->LanguageArray[0]);
+			$this->FormatMessage($this->LanguageArray['required_blank']);
 			$this->ViewUserProfile($you['username']);
 			return;
 		}
@@ -1754,7 +1581,7 @@ class WebLoginPE
 			$this->ViewUserProfile($you['username']);
 			return;
 		}
-		$this->FormatMessage($this->LanguageArray[37].' "'.$you['username'].'"');
+		$this->FormatMessage($this->LanguageArray['message_sent'].' "'.$you['username'].'"');
 		$this->ViewUserProfile($you['username']);
 		return;
 	}
@@ -1776,7 +1603,7 @@ class WebLoginPE
 		$web_user_attributes = $modx->getFullTableName('web_user_attributes');
 		
 		$email = $modx->db->escape(trim($_POST['email'])); // pixelchutes
-		if ( empty($email) ) return $this->FormatMessage($this->LanguageArray[0]); // pixelchutes        
+		if ( empty($email) ) return $this->FormatMessage($this->LanguageArray['required_blank']); // pixelchutes        
         $webpwdreminder_message = $modx->config['webpwdreminder_message'];
         $emailsubject = $modx->config['emailsubject'];
 		$site_name = $modx->config['site_name'];
@@ -1823,14 +1650,14 @@ class WebLoginPE
 
 			if (!$Reset->Send())
 			{
-				return $this->FormatMessage($this->LanguageArray[12]);
+				return $this->FormatMessage($this->LanguageArray['email_error']);
 			}
 		}
 		else
 		{
-			return $this->FormatMessage($this->LanguageArray[14]);
+			return $this->FormatMessage($this->LanguageArray['no_account']);
 		}
-		$this->FormatMessage($this->LanguageArray[103]);
+		$this->FormatMessage($this->LanguageArray['check_email_new_password']);
 		return;
 	}
 	
@@ -1862,7 +1689,7 @@ class WebLoginPE
 		
 		if ($limit !==1)
 		{
-			return $this->FormatMessage($this->LanguageArray[15]);
+			return $this->FormatMessage($this->LanguageArray['error_loading']);
 		}
 		
 		$this->User = $modx->db->getRow($userInfo);
@@ -1870,7 +1697,7 @@ class WebLoginPE
 		
 		if (($passwordKey !== $cachePassword) || ($activationKey !== $cacheKey))
 		{
-			return $this->FormatMessage($this->LanguageArray[16]);
+			return $this->FormatMessage($this->LanguageArray['invalid_activation']);
 		}
 		
 		if (!empty($newPassword) && isset($newPassword) && isset($newPasswordConfirm))
@@ -1892,24 +1719,24 @@ class WebLoginPE
 					}
 					else
 					{
-						return $this->FormatMessage($this->LanguageArray[3]);
+						return $this->FormatMessage($this->LanguageArray['short_password']);
 					}
 				}
 				else
 				{
-					return $this->FormatMessage($this->LanguageArray[4]);
+					return $this->FormatMessage($this->LanguageArray['illegal_password']);
 				}
 			}
 			else
 			{
-				return $this->FormatMessage($this->LanguageArray[2]);
+				return $this->FormatMessage($this->LanguageArray['mismatched_fields']);
 			}
 		}
 		if(!$saveMyPassword || !$unblockUser)
 		{ 
-			return $this->FormatMessage($this->LanguageArray[17]);
+			return $this->FormatMessage($this->LanguageArray['activation_error']);
 		}
-		$this->FormatMessage($this->LanguageArray[104]);
+		$this->FormatMessage($this->LanguageArray['new_password_activated']);
 		return;
 	}
 	
@@ -1959,7 +1786,7 @@ class WebLoginPE
 					else if ($key == 'dob')
 					{
 						// CREDIT : Guillaume for not format an empty date
-						$value==0?'':$modx->setPlaceholder('user.'.$key, strftime($this->dobFormat, $value)); // dobFormat by Bruno
+						$value==0?'':$modx->setPlaceholder('user.'.$key, strftime('%m-%d-%Y', $value));
 						$modx->setPlaceholder('user.age', strftime('%Y', time() - $value));
 						
 					}
@@ -1967,7 +1794,7 @@ class WebLoginPE
 					{
 						if ($value == 0)
 						{
-							$modx->setPlaceholder('user.'.$key, $this->LanguageArray[33]);
+							$modx->setPlaceholder('user.'.$key, $this->LanguageArray['unknown']);
 						}
 						else
 						{
@@ -2004,8 +1831,8 @@ class WebLoginPE
 		
 		// Handle Special input placeholders.
 		include_once 'assets/snippets/webloginpe/Default Forms/countryCodes.php';
-		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes);
-		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes);
+		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray['country'], $countryCodes);
+		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray['gender'], $genderCodes);
 
 		foreach ($inputHandler as $value)
 		{
@@ -2019,7 +1846,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -2079,7 +1906,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -2111,7 +1938,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
@@ -2218,7 +2045,7 @@ class WebLoginPE
 			{ //increment the failed login counter, and block!
 	            $sql = "UPDATE ".$web_user_attributes." SET `failedlogincount`='0', `blockeduntil`='".(time() + ($modx->config['blocked_minutes'] * 60))."' WHERE `internalKey`='".$this->User['internalKey']."'";
 	            $failLoginAndBlockUser = $modx->db->query($sql);
-				$anError = str_replace('[+000+]', $modx->config['blocked_minutes'], $this->LanguageArray[19]);
+				$anError = str_replace('[+000+]', $modx->config['blocked_minutes'], $this->LanguageArray['blocked']);
 				$this->FormatMessage($anError);
 	        	return;
 			}
@@ -2232,7 +2059,7 @@ class WebLoginPE
 				
 				$failedLoginCount = $this->User['failedlogincount'];
 				
-				$anError = $this->LanguageArray[20];
+				$anError = $this->LanguageArray['failed_count'];
 				$anError = str_replace('[+000+]', $failedLoginCount, $anError);
 				$anError = str_replace('[+111+]', $modx->config['blocked_minutes'], $anError);
 				$anError = str_replace('[+222+]', $modx->config['failed_login_attempts'], $anError);
@@ -2587,7 +2414,7 @@ class WebLoginPE
 		if ($this->User['failedlogincount'] >= $modx->config['failed_login_attempts'] && $this->User['blockeduntil'] > time())
 		{
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[22]);
+	        return $this->FormatMessage($this->LanguageArray['too_many_failed']);
 	    }
 	
 		if ($this->User['failedlogincount'] >= $modx->config['failed_login_attempts'] && $this->User['blockeduntil'] < time())
@@ -2600,7 +2427,7 @@ class WebLoginPE
 		if ($this->User['blocked'] == "1")
 		{ // this user has been blocked by an admin, so no way he's loggin in!
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[23]);
+	        return $this->FormatMessage($this->LanguageArray['blocked_by_admin']);
 	    }
 			
 		if ($this->User['blockeduntil'] >= time())
@@ -2610,21 +2437,21 @@ class WebLoginPE
 			$blockedMinutes = substr($UserIsBlockedUntil, 0, strpos($UserIsBlockedUntil, "."));
 			
 			$this->SessionHandler('destroy');
-			$anError = str_replace('[+000+]', $blockedMinutes, $this->LanguageArray[24]);
+			$anError = str_replace('[+000+]', $blockedMinutes, $this->LanguageArray['blocked_until']);
 			return $this->FormatMessage($anError);
 		}
 	
 		if($this->User['blockedafter'] > 0 && $this->User['blockedafter'] < time())
 		{ // this user has a block after date
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[23]);
+	        return $this->FormatMessage($this->LanguageArray['blocked_by_admin']);
 	    }
 	
 		if (isset($modx->config['allowed_ip']))
 		{
 	        if (strpos($modx->config['allowed_ip'],$_SERVER['REMOTE_ADDR'])===false)
 			{
-	            return $this->FormatMessage($this->LanguageArray[25]);
+	            return $this->FormatMessage($this->LanguageArray['bad_location']);
 	        }
 	    }
 	
@@ -2634,7 +2461,7 @@ class WebLoginPE
 	        $day = $date['wday']+1;
 	        if (strpos($modx->config['allowed_days'], $day) === false)
 			{
-	            return $this->FormatMessage($this->LanguageArray[26]);
+	            return $this->FormatMessage($this->LanguageArray['bad_time']);
 	        }        
 	    }
 		
@@ -2649,20 +2476,26 @@ class WebLoginPE
 	 * @return int Returns a UNIX timestamp for the date provided.
 	 * @author Scotty Delicious
 	 */
-	function MakeDateForDb($date) // modified by Bruno for $dobFormat
+	function MakeDateForDb($date)
 	{
-		$formatArray = split('[/.-]', $this->dobFormat);
-		$dateArray = split('[/.-]', $date);
 		// $date is a string like 01-22-1975.
-		if (count($dateArray) !== 3)
-			return $this->FormatMessage($this->LanguageArray[27]);
-		$daypos = array_search('%d', $formatArray);
-		$monthpos = array_search('%m', $formatArray);
-		$yearpos = array_search('%Y', $formatArray);
-
+		if (strpos($date, '-'))
+		{
+			$dateArray = explode('-', $date);
+		}
+		else if (strpos($date, '/'))
+		{
+			$dateArray = explode('/', $date);
+		}
+		else
+		{
+			return $this->FormatMessage($this->LanguageArray['bad_date_format']);
+		}
+		
+		$dateArray = explode('-', $date);
 		// $dateArray is somethink like [0]=01, [1]=22, [2]=1975
 		// make a unix timestamp out of the original date string.
-		$timestamp = mktime(0, 0, 0, $dateArray[$monthpos], $dateArray[$daypos], $dateArray[$yearpos]);
+		$timestamp = mktime(0, 0, 0, $dateArray[0], $dateArray[1], $dateArray[2]);
 		return $timestamp;
 	}
 	
@@ -2686,14 +2519,14 @@ class WebLoginPE
 		if ($_FILES['photo']['size'] >= $imageAttributes[0])
 		{
 			$sizeInKb = round($imageAttributes[0] / 1024);
-			$sizeError = str_replace('[+000+]', $sizeInKb, $this->LanguageArray[28]);
+			$sizeError = str_replace('[+000+]', $sizeInKb, $this->LanguageArray['big_photo']);
 			return $this->FormatMessage($sizeError);
 		}
 		
 		$userImage = $modx->config['base_path'].strtolower(str_replace(' ', '-', basename( $_FILES['photo']['name'])));
 		if (!move_uploaded_file($_FILES['photo']['tmp_name'], $userImage))
 		{
-			return $this->FormatMessage($this->LanguageArray[29]);
+			return $this->FormatMessage($this->LanguageArray['failed_image_upload']);
 		}
 		
 		// License and registration ma'am. I need to se an ID!
@@ -2759,7 +2592,7 @@ class WebLoginPE
 				break;
 				
 			default	:
-				return $this->FormatMessage($this->LanguageArray[30]);
+				return $this->FormatMessage($this->LanguageArray['photo_type']);
 				break;
 		}
 		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
@@ -2803,18 +2636,17 @@ class WebLoginPE
 	 */
 	function StringForGenderInt($genderInt)
 	{
-    // use language file by Jako
 		if ($genderInt == 1)
 		{
-			return isset($this->LanguageArray[106]) ? $this->LanguageArray[106] : 'Male';
+			return 'Male';
 		}
 		else if ($genderInt == 2)
 		{
-			return isset($this->LanguageArray[107]) ? $this->LanguageArray[107] : 'Female';
+			return 'Female';
 		}
 		else
 		{
-			return $this->LanguageArray[33];
+			return 'Unknown';
 		}
 		
 	}
@@ -2827,22 +2659,251 @@ class WebLoginPE
 	 * @param int $countryInt 
 	 * @return string The name of the country
 	 * @author Scotty Delicious
-	 * @author Jako
 	 */
 	function StringForCountryInt($countryInt)
 	{
-		global $modx;
-		$countryInt = (string) $countryInt;
-		
-		// use manager country.inc by Jako
-		$_country_lang = array();
-		$langFile = isset($this->LanguageArray[44]) ? $this->LanguageArray[44] : 'english';
-		if(file_exists($modx->config['base_path']."manager/includes/lang/country/".$langFile."_country.inc.php")) {
-			include $modx->config['base_path']."manager/includes/lang/country/".$langFile."_country.inc.php";
-		} else { 
-			include $modx->config['base_path']."manager/includes/lang/country/english_country.inc.php";
+		switch ($countryInt)
+		{
+			case "1" : return 'Afghanistan'; break;
+            case "2" : return 'Albania'; break;
+            case "3" : return 'Algeria'; break;
+            case "4" : return 'American Samoa'; break;
+            case "5" : return 'Andorra'; break;
+            case "6" : return 'Angola'; break;
+            case "7" : return 'Anguilla'; break;
+            case "8" : return 'Antarctica'; break;
+            case "9" : return 'Antigua and Barbuda'; break;
+            case "10" : return 'Argentina'; break;
+            case "11" : return 'Armenia'; break;
+            case "12" : return 'Aruba'; break;
+            case "13" : return 'Australia'; break;
+            case "14" : return 'Austria'; break;
+            case "15" : return 'Azerbaijan'; break;
+            case "16" : return 'Bahamas'; break;
+            case "17" : return 'Bahrain'; break;
+            case "18" : return 'Bangladesh'; break;
+            case "19" : return 'Barbados'; break;
+            case "20" : return 'Belarus'; break;
+            case "21" : return 'Belgium'; break;
+            case "22" : return 'Belize'; break;
+            case "23" : return 'Benin'; break;
+            case "24" : return 'Bermuda'; break;
+            case "25" : return 'Bhutan'; break;
+            case "26" : return 'Bolivia'; break;
+            case "27" : return 'Bosnia and Herzegowina'; break;
+            case "28" : return 'Botswana'; break;
+            case "29" : return 'Bouvet Island'; break;
+            case "30" : return 'Brazil'; break;
+            case "31" : return 'British Indian Ocean Territory'; break;
+            case "32" : return 'Brunei Darussalam'; break;
+            case "33" : return 'Bulgaria'; break;
+            case "34" : return 'Burkina Faso'; break;
+            case "35" : return 'Burundi'; break;
+            case "36" : return 'Cambodia'; break;
+            case "37" : return 'Cameroon'; break;
+            case "38" : return 'Canada'; break;
+            case "39" : return 'Cape Verde'; break;
+            case "40" : return 'Cayman Islands'; break;
+            case "41" : return 'Central African Republic'; break;
+            case "42" : return 'Chad'; break;
+            case "43" : return 'Chile'; break;
+            case "44" : return 'China'; break;
+            case "45" : return 'Christmas Island'; break;
+            case "46" : return 'Cocos (Keeling) Islands'; break;
+            case "47" : return 'Colombia'; break;
+            case "48" : return 'Comoros'; break;
+            case "49" : return 'Congo'; break;
+            case "50" : return 'Cook Islands'; break;
+            case "51" : return 'Costa Rica'; break;
+            case "52" : return 'Cote D&#39;Ivoire'; break;
+            case "53" : return 'Croatia'; break;
+            case "54" : return 'Cuba'; break;
+            case "55" : return 'Cyprus'; break;
+            case "56" : return 'Czech Republic'; break;
+            case "57" : return 'Denmark'; break;
+            case "58" : return 'Djibouti'; break;
+            case "59" : return 'Dominica'; break;
+            case "60" : return 'Dominican Republic'; break;
+            case "61" : return 'East Timor'; break;
+            case "62" : return 'Ecuador'; break;
+            case "63" : return 'Egypt'; break;
+            case "64" : return 'El Salvador'; break;
+            case "65" : return 'Equatorial Guinea'; break;
+            case "66" : return 'Eritrea'; break;
+            case "67" : return 'Estonia'; break;
+            case "68" : return 'Ethiopia'; break;
+            case "69" : return 'Falkland Islands (Malvinas)'; break;
+            case "70" : return 'Faroe Islands'; break;
+            case "71" : return 'Fiji'; break;
+            case "72" : return 'Finland'; break;
+            case "73" : return 'France'; break;
+            case "74" : return 'France, Metropolitan'; break;
+            case "75" : return 'French Guiana'; break;
+            case "76" : return 'French Polynesia'; break;
+            case "77" : return 'French Southern Territories'; break;
+            case "78" : return 'Gabon'; break;
+            case "79" : return 'Gambia'; break;
+            case "80" : return 'Georgia'; break;
+            case "81" : return 'Germany'; break;
+            case "82" : return 'Ghana'; break;
+            case "83" : return 'Gibraltar'; break;
+            case "84" : return 'Greece'; break;
+            case "85" : return 'Greenland'; break;
+            case "86" : return 'Grenada'; break;
+            case "87" : return 'Guadeloupe'; break;
+            case "88" : return 'Guam'; break;
+            case "89" : return 'Guatemala'; break;
+            case "90" : return 'Guinea'; break;
+            case "91" : return 'Guinea-bissau'; break;
+            case "92" : return 'Guyana'; break;
+            case "93" : return 'Haiti'; break;
+            case "94" : return 'Heard and Mc Donald Islands'; break;
+            case "95" : return 'Honduras'; break;
+            case "96" : return 'Hong Kong'; break;
+            case "97" : return 'Hungary'; break;
+            case "98" : return 'Iceland'; break;
+            case "99" : return 'India'; break;
+            case "100" : return 'Indonesia'; break;
+            case "101" : return 'Iran (Islamic Republic of)'; break;
+            case "102" : return 'Iraq'; break;
+            case "103" : return 'Ireland'; break;
+            case "104" : return 'Israel'; break;
+            case "105" : return 'Italy'; break;
+            case "106" : return 'Jamaica'; break;
+            case "107" : return 'Japan'; break;
+            case "108" : return 'Jordan'; break;
+            case "109" : return 'Kazakhstan'; break;
+            case "110" : return 'Kenya'; break;
+            case "111" : return 'Kiribati'; break;
+            case "112" : return 'Korea, Democratic People&#39;s Republic of'; break;
+            case "113" : return 'Korea, Republic of'; break;
+            case "114" : return 'Kuwait'; break;
+            case "115" : return 'Kyrgyzstan'; break;
+            case "116" : return 'Lao People&#39;s Democratic Republic'; break;
+            case "117" : return 'Latvia'; break;
+            case "118" : return 'Lebanon'; break;
+            case "119" : return 'Lesotho'; break;
+            case "120" : return 'Liberia'; break;
+            case "121" : return 'Libyan Arab Jamahiriya'; break;
+            case "122" : return 'Liechtenstein'; break;
+            case "123" : return 'Lithuania'; break;
+            case "124" : return 'Luxembourg'; break;
+            case "125" : return 'Macau'; break;
+            case "126" : return 'Macedonia, The Former Yugoslav Republic of'; break;
+            case "127" : return 'Madagascar'; break;
+            case "128" : return 'Malawi'; break;
+            case "129" : return 'Malaysia'; break;
+            case "130" : return 'Maldives'; break;
+            case "131" : return 'Mali'; break;
+            case "132" : return 'Malta'; break;
+            case "133" : return 'Marshall Islands'; break;
+            case "134" : return 'Martinique'; break;
+            case "135" : return 'Mauritania'; break;
+            case "136" : return 'Mauritius'; break;
+            case "137" : return 'Mayotte'; break;
+            case "138" : return 'Mexico'; break;
+            case "139" : return 'Micronesia, Federated States of'; break;
+            case "140" : return 'Moldova, Republic of'; break;
+            case "141" : return 'Monaco'; break;
+            case "142" : return 'Mongolia'; break;
+            case "143" : return 'Montserrat'; break;
+            case "144" : return 'Morocco'; break;
+            case "145" : return 'Mozambique'; break;
+            case "146" : return 'Myanmar'; break;
+            case "147" : return 'Namibia'; break;
+            case "148" : return 'Nauru'; break;
+            case "149" : return 'Nepal'; break;
+            case "150" : return 'Netherlands'; break;
+            case "151" : return 'Netherlands Antilles'; break;
+            case "152" : return 'New Caledonia'; break;
+            case "153" : return 'New Zealand'; break;
+            case "154" : return 'Nicaragua'; break;
+            case "155" : return 'Niger'; break;
+            case "156" : return 'Nigeria'; break;
+            case "157" : return 'Niue'; break;
+            case "158" : return 'Norfolk Island'; break;
+            case "159" : return 'Northern Mariana Islands'; break;
+            case "160" : return 'Norway'; break;
+            case "161" : return 'Oman'; break;
+            case "162" : return 'Pakistan'; break;
+            case "163" : return 'Palau'; break;
+            case "164" : return 'Panama'; break;
+            case "165" : return 'Papua New Guinea'; break;
+            case "166" : return 'Paraguay'; break;
+            case "167" : return 'Peru'; break;
+            case "168" : return 'Philippines'; break;
+            case "169" : return 'Pitcairn'; break;
+            case "170" : return 'Poland'; break;
+            case "171" : return 'Portugal'; break;
+            case "172" : return 'Puerto Rico'; break;
+            case "173" : return 'Qatar'; break;
+            case "174" : return 'Reunion'; break;
+            case "175" : return 'Romania'; break;
+            case "176" : return 'Russian Federation'; break;
+            case "177" : return 'Rwanda'; break;
+            case "178" : return 'Saint Kitts and Nevis'; break;
+            case "179" : return 'Saint Lucia'; break;
+            case "180" : return 'Saint Vincent and the Grenadines'; break;
+            case "181" : return 'Samoa'; break;
+            case "182" : return 'San Marino'; break;
+            case "183" : return 'Sao Tome and Principe'; break;
+            case "184" : return 'Saudi Arabia'; break;
+            case "185" : return 'Senegal'; break;
+            case "186" : return 'Seychelles'; break;
+            case "187" : return 'Sierra Leone'; break;
+            case "188" : return 'Singapore'; break;
+            case "189" : return 'Slovakia (Slovak Republic)'; break;
+            case "190" : return 'Slovenia'; break;
+            case "191" : return 'Solomon Islands'; break;
+            case "192" : return 'Somalia'; break;
+            case "193" : return 'South Africa'; break;
+            case "194" : return 'South Georgia and the South Sandwich Islands'; break;
+            case "195" : return 'Spain'; break;
+            case "196" : return 'Sri Lanka'; break;
+            case "197" : return 'St. Helena'; break;
+            case "198" : return 'St. Pierre and Miquelon'; break;
+            case "199" : return 'Sudan'; break;
+            case "200" : return 'Suriname'; break;
+            case "201" : return 'Svalbard and Jan Mayen Islands'; break;
+            case "202" : return 'Swaziland'; break;
+            case "203" : return 'Sweden'; break;
+            case "204" : return 'Switzerland'; break;
+            case "205" : return 'Syrian Arab Republic'; break;
+            case "206" : return 'Taiwan'; break;
+            case "207" : return 'Tajikistan'; break;
+            case "208" : return 'Tanzania, United Republic of'; break;
+            case "209" : return 'Thailand'; break;
+            case "210" : return 'Togo'; break;
+            case "211" : return 'Tokelau'; break;
+            case "212" : return 'Tonga'; break;
+            case "213" : return 'Trinidad and Tobago'; break;
+            case "214" : return 'Tunisia'; break;
+            case "215" : return 'Turkey'; break;
+            case "216" : return 'Turkmenistan'; break;
+            case "217" : return 'Turks and Caicos Islands'; break;
+            case "218" : return 'Tuvalu'; break;
+            case "219" : return 'Uganda'; break;
+            case "220" : return 'Ukraine'; break;
+            case "221" : return 'United Arab Emirates'; break;
+            case "222" : return 'United Kingdom'; break;
+            case "223" : return 'United States'; break;
+            case "224" : return 'United States Minor Outlying Islands'; break;
+            case "225" : return 'Uruguay'; break;
+            case "226" : return 'Uzbekistan'; break;
+            case "227" : return 'Vanuatu'; break;
+            case "228" : return 'Vatican City State (Holy See)'; break;
+            case "229" : return 'Venezuela'; break;
+            case "230" : return 'Viet Nam'; break;
+            case "231" : return 'Virgin Islands (British)'; break;
+            case "232" : return 'Virgin Islands (U.S.)'; break;
+            case "233" : return 'Wallis and Futuna Islands'; break;
+            case "234" : return 'Western Sahara'; break;
+            case "235" : return 'Yemen'; break;
+            case "236" : return 'Yugoslavia'; break;
+            case "237" : return 'Zaire'; break;
+            case "238" : return 'Zambia'; break;
+            case "239" : return 'Zimbabwe'; break;
 		}
-		return $_country_lang[$countryInt];
 	}
 	
 	
@@ -2856,7 +2917,7 @@ class WebLoginPE
 	function ValidateEmail($Email)
 	{
 		// Original: ^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$
-	      if (!eregi("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,7}$", $Email)) // pixelchutes
+        if (!eregi("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,7}$", $Email)) // pixelchutes
 		{ 
 			return $this->FormatMessage('The Email address you provided does not appear to be a properly formatted address.');
 		}
