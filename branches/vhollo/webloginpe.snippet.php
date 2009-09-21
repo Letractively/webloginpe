@@ -51,11 +51,11 @@
 	include MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.templates.php';
 	if (file_exists(MODX_BASE_PATH.'assets/snippets/webloginpe/lang/'.$lang.'.php'))
 	{
-		include_once MODX_BASE_PATH.'assets/snippets/webloginpe/lang/'.$lang.'.php';
+		if(!isset($wlpe_lang)) include MODX_BASE_PATH.'assets/snippets/webloginpe/lang/'.$lang.'.php';
 	}
 	else
 	{
-		include_once MODX_BASE_PATH.'assets/snippets/webloginpe/lang/en.php';
+		if(!isset($wlpe_lang)) include MODX_BASE_PATH.'assets/snippets/webloginpe/lang/en.php';
 		$modx->setPlaceholder($id.'wlpe.message', $wlpe_lang[105]);
 		print '[+'.$id.'wlpe.message+]';
 	}
