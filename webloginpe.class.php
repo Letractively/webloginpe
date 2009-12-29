@@ -2750,6 +2750,7 @@ class WebLoginPE
 				break;
 				
 			case 'image/png':
+			case 'image/x-png':
 				$image = imagecreatefrompng($userImage);
 				imageSaveAlpha($image, true);
 				imagesavealpha($image_p, true);
@@ -2780,6 +2781,7 @@ class WebLoginPE
 				break;
 				
 			case 'image/png':
+			case 'image/x-png':
 				imagepng($image_p, $userImageFilePath, 0);
 				break;
 				
