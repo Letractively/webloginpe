@@ -6,6 +6,8 @@
  *
  * v1.3.2 mods & bug fixes committed by allanb @ MODx CMS Forums from Various Other Forum Members
  *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
+ *        Fixed issue where PHP4 compatible construct caused failures with some PHP5 configurations.
+ *              Needs to be tested with PHP4.[r5][r70]
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
  * @access public
@@ -172,7 +174,10 @@ class WebLoginPE
 	 */
 	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
 	{
-		$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+		if(substr(phpversion(),0,1) < 5){
+			
+			$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+		
 	}
 	
 	
@@ -1056,6 +1061,7 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 			$positionInList=0;
 		}
 		$numRows = "SELECT count(*) FROM ".$web_users;
+		$web_users = $modx->getFullTableName('web_users');
 		$allRows = $modx->db->query("SELECT id FROM ".$web_users);
 		$alumni = mysql_num_rows($allRows);
 		$pagination = $this->Pagination;
