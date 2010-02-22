@@ -5,6 +5,7 @@
 	 *
 	 * v1.3.2 mods & bug fixes committed by allanb @ MODx CMS Forums from Various Other Forum Members
      *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
+     *        Fixed glitch with registration success redirect when pause value is set to 0[r9][r73]
      * 
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
@@ -117,8 +118,9 @@
 				{
 					if ($registration == 'success')
 					{
-						$url = rtrim($modx->config['site_url'], '/').$modx->makeURL($regSuccessId);
-						header('Refresh: '.$regSuccessPause.';URL='.$url);
+						$url = $modx->makeURL($regSuccessId);
+						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
+						//header('Refresh: '.$regSuccessPause.';URL='.$url);
 						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;
@@ -336,8 +338,9 @@
 				{
 					if ($registration == 'success')
 					{
-						$url = rtrim($modx->config['site_url'], '/').$modx->makeURL($regSuccessId);
-						header('Refresh: '.$regSuccessPause.';URL='.$url);
+						$url = $modx->makeURL($regSuccessId);
+						$modx->sendRedirect($url,$regSuccessPause,'REDIRECT_REFRESH');
+						//header('Refresh: '.$regSuccessPause.';URL='.$url);
 						return $displayRegSuccessTpl;
 					}
 					return $displayRegisterTpl;
