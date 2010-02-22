@@ -4,6 +4,8 @@
  * A progressively enhanced (PE) user management and login snippet for MODx
  * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
  *
+ * v1.3.2 mods & bug fixes committed by allanb @ MODx CMS Forums from Various Other Forum Members
+ *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
  * @access public
@@ -137,19 +139,29 @@ class WebLoginPE
 	var $DateFormat;
 	
 	/**
+	 * Number of items listed on one page
+	 *
+	 * @var number
+	 */
+	var $paging;
+	
+	
+	/**
 	 * WebLoginPE Class Constructor
 	 *
 	 * @param array $LanguageArray An array of language specific strings.
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple')
+	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
 	{
 		require_once 'manager/includes/controls/class.phpmailer.php';
 		$this->LanguageArray = $LanguageArray;
 		$this->DateFormat = $dateFormat;
 		$this->UserImageSettings = $UserImageSettings;
 		$this->Type = $type;
+		//Added by Taff
+		$this->Pagination = $paging;
 	}
 	
 	
@@ -158,9 +170,9 @@ class WebLoginPE
 	 *
 	 * @see __construct
 	 */
-	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple')
+	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
 	{
-		$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type);
+		$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
 	}
 	
 	
@@ -1039,8 +1051,31 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 	{
 		global $modx;
 		
-		$web_users = $modx->getFullTableName('web_users');
-		$fetchUsers = $modx->db->query("SELECT `username` FROM ".$web_users);
+		$positionInList =trim($_REQUEST['pag']);
+		if(!is_numeric($positionInList)){
+			$positionInList=0;
+		}
+		$numRows = "SELECT count(*) FROM ".$web_users;
+		$allRows = $modx->db->query("SELECT id FROM ".$web_users);
+		$alumni = mysql_num_rows($allRows);
+		$pagination = $this->Pagination;
+		$num_rows = ceil($alumni/$pagination);
+		
+		if($num_rows > 1){
+			for($i=1;$i<=$num_rows;$i++){
+				$startPos = ($i*$pagination) - $pagination;
+				if($startPos !=$positionInList){
+					$output.=" <a href=\"index.php?id=".$modx->documentIdentifier."&pag=".$startPos."\">".$i."</a>";
+					}
+				else{
+					$output.=" ".$i;
+				}
+			}
+		}
+		echo $output;
+		$fetchUsers = $modx->db->query("SELECT `username` FROM ".$web_users."ORDER BY `username` LIMIT ".$positionInList.",".$pagination);
+
+
 		$allUsers = $this->FetchAll($fetchUsers);
 		
 		if ($listUsers == '')

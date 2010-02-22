@@ -3,6 +3,9 @@
 	 * WebLoginPE Snippet 1.3.1
 	 * v1.3.1 Bugfix by Soshite @ MODx CMS Forums & Various Other Forum Members
 	 *
+	 * v1.3.2 mods & bug fixes committed by allanb @ MODx CMS Forums from Various Other Forum Members
+     *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
+     * 
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
 	 * @version 1.3.1
@@ -23,6 +26,7 @@
 	$dateFormat = isset($dateFormat) ? $dateFormat : '%A %B %d, %Y at %I:%M %p';
 	$disableServices = isset($disableServices) ? explode(',', str_replace(', ',',',$disableServices)) : array();
 	$tableCheck = isset($tableCheck) ? $tableCheck : 1;
+	$paging = isset($paging) ? $paging : 3000;
 	
 	include_once MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.class.php';
 	include MODX_BASE_PATH.'assets/snippets/webloginpe/webloginpe.templates.php';
@@ -37,7 +41,7 @@
 		print '[+wlpe.message+]';
 	}
 	
-	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type);
+	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging);
 	$wlpe->CustomTable($customTable, $customFields, $prefixTable, $tableCheck);
 
 	$liHomeId = isset($liHomeId) ? explode(',', $liHomeId) : '';
