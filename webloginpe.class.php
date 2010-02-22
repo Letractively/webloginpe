@@ -8,6 +8,9 @@
  *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
  *        Fixed issue where PHP4 compatible construct caused failures with some PHP5 configurations.
  *              Needs to be tested with PHP4.[r5][r70]
+ *        Converted userlist filter code to a switch statement;
+ *              Added 'No results' message when userlist is empty;[r7][r71]
+ *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
  * @access public
@@ -1163,8 +1166,9 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 					
 					foreach ($CompleteUserList as $theUser)
 					{
-						if ($filterBy == 'webgroup')
+						switch($filterBy)
 						{
+							case 'webgroup':
 							$web_groups = $modx->getFullTableName('web_groups');
 							$webgroup_names = $modx->getFullTableName('webgroup_names');
 							$findWebGroup = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` = '".$filterValue."'");
@@ -1184,9 +1188,9 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-						}
-						else if ($filterBy == 'online')
-						{
+							break;
+							
+							case 'online':
 							$active_users = $modx->getFullTableName('active_users');
 							$activityCheck = "SELECT * FROM ".$active_users." WHERE `internalKey` = '-".$theUser['internalKey']."'";
 							$lastActive = $modx->db->query($activityCheck);
@@ -1209,11 +1213,9 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 								$username = $theUser['username'];
 								unset($CompleteUserList[$username]);
 							}
-						}
-						else
-						{
-							foreach ($theUser as $attribute => $value)
-							{
+							break;
+							
+							default:
 								if (empty($theUser[$filterBy]) || $theUser[$filterBy] == '' && $filterBy !== 'webgroup')
 								{
 									$username = $theUser['username'];
@@ -1233,10 +1235,11 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 										}
 									}
 								}
+								break;
 							}
 						}
 					}
-				}
+				
 				// SORT ARRAY
 				$sortArray = array();
 			    foreach($CompleteUserList as $username => $attributes)
@@ -1328,6 +1331,7 @@ if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['userna
 				$FinalDisplay .= $CombinedList;
 			}
 		}
+		$FinalDisplay = (empty($FinalDisplay)?"<p>No results.</p>":$FinalDisplay);
 		return $FinalDisplay;
 	}
 	
