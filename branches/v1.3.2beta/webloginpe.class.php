@@ -11,6 +11,7 @@
  *        Converted userlist filter code to a switch statement;
  *              Added 'No results' message when userlist is empty;[r7][r71]
  *        Added cleanup any unused placeholders in administrative email notifications[r8][r72]
+ *        Added spans to labels in ViewUserProfile function [r10][r74]
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
@@ -1465,7 +1466,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -1528,7 +1529,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -1560,7 +1561,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
@@ -1894,7 +1895,7 @@ class WebLoginPE
 			if ($type == 'select multiple' || $type == 'select')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				if ($type == 'select multiple')
 				{
 					$ph .= '<'.$type.' id="'.$DOMid.'" name="'.$name.'[]">'."\n";
@@ -1954,7 +1955,7 @@ class WebLoginPE
 			if ($type == 'radio')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$ph .= '<div id="'.$DOMid.'Div">'."\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
@@ -1986,7 +1987,7 @@ class WebLoginPE
 			if ($type == 'checkbox')
 			{
 				$ph = '';
-				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label">'.$label."\n";
+				$ph .= '<label for="'.$DOMid.'" id="'.$DOMid.'Label"><span>'.$label."</span>\n";
 				$options = explode(',', $values);
 				foreach ($options as $eachOption)
 				{
