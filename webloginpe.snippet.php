@@ -6,7 +6,12 @@
 	 * v1.3.2 mods & bug fixes committed by allanb @ MODx CMS Forums from Various Other Forum Members
      *        Added pagination based on code from Taff (http://xrl.us/oqafd)[r4][r69]
      *        Fixed glitch with registration success redirect when pause value is set to 0[r9][r73]
-     * 
+     *        Added approveuser manager function type for facilitating the activation of pending users;
+     *              Added ability to set a field to obtain group settings [groupsField];
+     *              Added ability to approve certain domains [approvedDomains];
+     *              Added ability to set what group is used for pending users [Pending Users];
+     *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
+     *
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
 	 * @version 1.3.1
@@ -18,6 +23,9 @@
 	$regType = isset($regType) ? $regType : 'instant';
 	$notify = isset($notify) ? $notify : '';
 	$groups = isset($groups) ? $groups : '';
+	$groupsField = isset($groupsField) ? $groupsField : '';
+	$approvedDomains = isset($approvedDomains) ? $approvedDomains : '';
+	$pendingGroups = isset($pendingGroups) ? $pendingGroups : 'Pending Users';
 	$regRequired = isset($regRequired) ? $regRequired : '';
 	$customTable = isset($customTable) ? $customTable : 'web_user_attributes_extended';
 	$customFields = isset($customFields) ? $customFields : '';
@@ -53,6 +61,9 @@
 	$profileHomeId = isset($profileHomeId) ? $profileHomeId : '';
 	$inputHandler = isset($inputHandler) ? explode('||', $inputHandler) : array();
 	$usersList = isset($usersList) ? $usersList : '';
+	$activateId = isset($activateId) ? $activateId : $modx->documentIdentifier;
+	$activateConfig = isset($activateConfig) ? $activateConfig : '';
+	$activatePost = isset($activatePost) ? $activatePost : '';
 	
 	if ($regType == 'verify'){$wlpeRegisterTpl = $wlpeRegisterVerifyTpl;}else{$wlpeRegisterTpl = $wlpeRegisterInstantTpl;}
 	
@@ -112,7 +123,7 @@
 		{
 			case 'register' :
 				if (in_array('register', $disableServices)){return;}
-				$registration = $wlpe->Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject);
+				$registration = $wlpe->Register($regType, $groups, $regRequired, $notify, $notifyTpl, $notifySubject, $approvedDomains, $pendingGroups);
 				
 				if (isset($regSuccessId) && $regSuccessId !== '')
 				{
@@ -238,7 +249,33 @@
 				
 			case 'saveuserprofile' :
 				if (in_array('saveuserprofile', $disableServices)){return;}
-				$wlpe->SaveUserProfile($_POST['internalKey']);
+				// Added to allow setting the groups via a form
+                if (!empty($_REQUEST[$groupsField]))
+                {
+                	if(is_array($_REQUEST[$groupsField]))
+                	{
+                		$groups = implode(",", $_REQUEST[$groupsField]);
+                	}
+                	else
+                	{
+                		$groups = $_REQUEST[$groupsField];
+                	}
+                }
+                
+                $wlpe->SaveUserProfile($_POST['internalKey'],$groups);
+                $manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
+                return $manageUsersPage;
+                break;
+                
+            case 'approveuser' :
+            	if (in_array('approveuser', $disableServices)){return;}
+            	// Added to allow setting the groups via a form
+            	if (!empty($_REQUEST[$groupsField]))
+            	{
+            		$groups = $_REQUEST[$groupsField];
+            	}
+            	$activate = true;
+            	$wlpe->SaveUserProfile($_POST['internalKey'],$groups,$activate,$activateId,$activateConfig,$activatePost);
 				$manageUsersPage = $wlpe->ViewAllUsers($displayManageTpl, $displayManageOuterTpl, $usersList);
 				return $manageUsersPage;
 				break;
