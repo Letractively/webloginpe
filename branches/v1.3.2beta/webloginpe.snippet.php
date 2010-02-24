@@ -11,6 +11,7 @@
      *              Added ability to approve certain domains [approvedDomains];
      *              Added ability to set what group is used for pending users [Pending Users];
      *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
+     *              No log details for this revision [r36][r76] 
      *
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
@@ -33,6 +34,7 @@
 	$lang = isset($lang) ? $lang : 'en';
 	$userImageSettings = isset($userImage) ? $userImage : '105000,100,100';
 	$dateFormat = isset($dateFormat) ? $dateFormat : '%A %B %d, %Y at %I:%M %p';
+	$dobFormat = isset($dobFormat) ? $dobFormat : '%m-%d-%Y'; // add by Bruno
 	$disableServices = isset($disableServices) ? explode(',', str_replace(', ',',',$disableServices)) : array();
 	$tableCheck = isset($tableCheck) ? $tableCheck : 1;
 	$paging = isset($paging) ? $paging : 3000;
@@ -52,6 +54,7 @@
 	
 	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging);
 	$wlpe->CustomTable($customTable, $customFields, $prefixTable, $tableCheck);
+	$wlpe->dobFormat = $dobFormat; // add by Bruno
 
 	$liHomeId = isset($liHomeId) ? explode(',', $liHomeId) : '';
 	$loHomeId = isset($loHomeId) ? $loHomeId : '';
