@@ -18,6 +18,7 @@
  *              Added ability to set what group is used for pending users [Pending Users];
  *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
  *        No Log file for this revision [r36][r76]
+ *        Small fix for PNG Userimages [r61][r77]
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
@@ -2785,6 +2786,7 @@ class WebLoginPE
 				break;
 				
 			case 'image/png':
+			case 'image/x-png':
 				$image = imagecreatefrompng($userImage);
 				imageSaveAlpha($image, true);
 				imagesavealpha($image_p, true);
@@ -2815,6 +2817,7 @@ class WebLoginPE
 				break;
 				
 			case 'image/png':
+			case 'image/x-png':
 				imagepng($image_p, $userImageFilePath, 0);
 				break;
 				
