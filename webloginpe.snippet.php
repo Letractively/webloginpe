@@ -11,7 +11,8 @@
      *              Added ability to approve certain domains [approvedDomains];
      *              Added ability to set what group is used for pending users [Pending Users];
      *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
-     *              No log details for this revision [r36][r76] 
+     *              No log details for this revision [r36][r76]
+     *              config, stylesheet and lang array modifications by sottwell August 2009[r54][r77]
      *
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
@@ -19,6 +20,12 @@
 	 *
 	 * See the "docs" folder for detailed usage and parameter instructions.
 	 */
+	// Allow use of a config file sottwell
+	$config = isset($config) ? $config : 'default';
+	if(file_exists(MODX_BASE_PATH . 'assets/snippets/webloginpe/configs/' . $config . '.config.php'))
+	{
+		include MODX_BASE_PATH . 'assets/snippets/webloginpe/configs/' . $config . '.config.php';
+	}
 
 	$type = isset($type) ? $type : 'simple';
 	$regType = isset($regType) ? $regType : 'instant';
@@ -48,7 +55,7 @@
 	else
 	{
 		include_once MODX_BASE_PATH.'assets/snippets/webloginpe/lang/en.php';
-		$modx->setPlaceholder('wlpe.message', $wlpe_lang[105]);
+		$modx->setPlaceholder('wlpe.message', $wlpe_lang['bad_langfile']); //sottwell
 		print '[+wlpe.message+]';
 	}
 	
@@ -106,6 +113,11 @@
 	else if (!empty($customJs))
 	{
 		$modx->regClientStartupScript($customJs);
+	}
+	
+	if(isset($customCSS)) //sottwell
+	{
+		$modx->regClientCss($customCSS);
 	}
 	
 	$wlpe->ActiveUsers();
@@ -426,9 +438,10 @@
                 // pixelchutes 1:57 AM 9/19/2007
                 // Here we check for an error, then reload the activation template if necessary
                 // Do NOT reload if wlpe->Report indicates success
-                 // Added strip_tags() around string which means an error is not thrown regarding a modifier from closing
+                // Added strip_tags() around string which means an error is not thrown regarding a modifier from closing
                 // html tag e.g. if $wlpe_lang[104] contains "</div>" this will fail as "/d" treated as modifier
-                if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang[104])."/i", $wlpe->Report ) )
+                // html tag e.g. if $wlpe_lang[new_password_activated] contains "</div>" this will fail as "/d" treated as modifier sottwell
+                if ( isset( $wlpe->Report ) && !preg_match( "/".strip_tags($wlpe_lang['new_password_activated'])."/i", $wlpe->Report ) ) //stottwell
                 {
                     return $displayActivateTpl;
                 }                
