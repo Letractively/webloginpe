@@ -19,6 +19,7 @@
  *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
  *        No Log file for this revision [r36][r76]
  *        Small fix for PNG Userimages [r61][r77]
+ *        Commit class updates sottwell [r55][r78]
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
@@ -242,7 +243,8 @@ class WebLoginPE
 		$this->Password = $modx->db->escape(strip_tags($_POST['password']));
 		if ($this->Username == '' || $this->Password == '')
 		{
-			$this->FormatMessage($this->LanguageArray[5]);
+			//$this->FormatMessage($this->LanguageArray[5]); sottwell
+			$this->FormatMessage($this->LanguageArray['required_blank']);
 			return;
 		}
 		$_SESSION['groups'] = array('Registered Users', 'Fans');
@@ -251,7 +253,8 @@ class WebLoginPE
 
 		if ($this->User == false)
 		{
-			$this->FormatMessage($this->LanguageArray[21]);
+			//$this->FormatMessage($this->LanguageArray[21]);sottwell
+			$this->FormatMessage($this->LanguageArray['bad_username']);
 			return;
 		}
 		
@@ -467,7 +470,8 @@ class WebLoginPE
 		// Check for required fields.
 		if ($_POST['username'] == '' || empty($_POST['username']) || trim($_POST['username']) == '' ) // pixelchutes
 		{			
-			return $this->FormatMessage($this->LanguageArray[0]);
+			//return $this->FormatMessage($this->LanguageArray[0]);sottwell
+			return $this->FormatMessage($this->LanguageArray['required_blank']);
 		}
 		if ( strlen($_POST['email']) > 0 ) // pixelchutes
 		{
@@ -488,7 +492,8 @@ class WebLoginPE
 					$formcode = $_POST['formcode'];
 					if ($_SESSION['veriword'] !== $formcode)
 					{
-						return $this->FormatMessage($this->LanguageArray[6]);
+						//return $this->FormatMessage($this->LanguageArray[6]);sottwell
+						return $this->FormatMessage($this->LanguageArray['bad_code']);
 					}
 				}
 				
@@ -506,25 +511,29 @@ class WebLoginPE
 				{
 					if ($field == 'tos')
 					{
-						return $this->FormatMessage($this->LanguageArray[34]);
+						//return $this->FormatMessage($this->LanguageArray[34]);sottwell
+						return $this->FormatMessage($this->LanguageArray['TOS']);
 					}
 					
-					return $this->FormatMessage($this->LanguageArray[0]);
+					//return $this->FormatMessage($this->LanguageArray[0]);sottwell
+					return $this->FormatMessage($this->LanguageArray['required_blank']);
 				}
 			}
 		}
 		
-		// Check username for bullshit.
+		// Check username for invalid characters.
 		$illegals = array('\\','\''); 
 		if (strlen(str_replace($illegals, '', $username)) !== strlen($username))
 		{
-			return $this->FormatMessage($this->LanguageArray[32]);
+			//return $this->FormatMessage($this->LanguageArray[32]); sottwell
+			return $this->FormatMessage($this->LanguageArray['illegal username']);
 		}
 		
 		// Check username length 
 		if (strlen($username) > 100)
 		{
-			return $this->FormatMessage($this->LanguageArray[1]);
+			//return $this->FormatMessage($this->LanguageArray[1]); sottwell
+			return $this->FormatMessage($this->LanguageArray['long_username']);
 		}
 		
 		// Check for arrays and that "confirm" fields match.
@@ -540,7 +549,8 @@ class WebLoginPE
 			{
 				if ($_POST[$field] !== $_POST[$confirm])
 				{
-					$error = $this->LanguageArray[2].' <br />';
+					//$error = $this->LanguageArray[2].' <br />';sottwell
+					$error = $this->LanguageArray['mismatched_fields'].' <br />';
 					$fieldMessage .= str_replace('[+000+]', '"'.$field.'"', $error);
 				}
 			}
@@ -559,17 +569,20 @@ class WebLoginPE
 		{
 			if (strlen($password) < 6)
 			{
-				return $this->FormatMessage($this->LanguageArray[3]);
+				//return $this->FormatMessage($this->LanguageArray[3]); sottwell
+				return $this->FormatMessage($this->LanguageArray['short_password']);
 			}
 			
 			if (empty($password) || $password == '')
 			{
-				return $this->FormatMessage($this->LanguageArray[3]);
+				//return $this->FormatMessage($this->LanguageArray[3]); sottwell
+				return $this->FormatMessage($this->LanguageArray['short_password']);
 			}
 			
 			if (md5($password) !== md5($_POST['password']))
 			{
-				return $this->FormatMessage($this->LanguageArray[4]);
+				//return $this->FormatMessage($this->LanguageArray[4]); sottwell
+				return $this->FormatMessage($this->LanguageArray['illegal_password']);
 			}
 		}
 		
@@ -578,13 +591,15 @@ class WebLoginPE
 		
 		if ($limit > 0)
 		{
-			return $this->FormatMessage($this->LanguageArray[7]);
+			//return $this->FormatMessage($this->LanguageArray[7]); sottwell
+			return $this->FormatMessage($this->LanguageArray['username_used']);
 		}
 		
 		$lowercase = strtolower(str_replace(' ', '_', $username));
 		if ($lowercase == 'default_user')
 		{
-			return $this->FormatMessage($this->LanguageArray[7]);
+			//return $this->FormatMessage($this->LanguageArray[7]); sottwell
+			return $this->FormatMessage($this->LanguageArray['username_used']);
 		}
 		
 		$checkEmail = $modx->db->query("SELECT * FROM ".$web_user_attributes." WHERE `email`='".$email."'");
@@ -592,7 +607,8 @@ class WebLoginPE
 		
 		if ($limit > 0)
 		{
-			return $this->FormatMessage($this->LanguageArray[8]);
+			//return $this->FormatMessage($this->LanguageArray[8]); sottwell
+			return $this->FormatMessage($this->LanguageArray['email_used']);
 		}
 		
 		// If you want to verify your users email address before letting them log in, this generates a random password.
@@ -622,13 +638,14 @@ class WebLoginPE
 		}
 		$this->OnBeforeWebSaveUser($NewUser, array());
 		
-		// If all that crap checks out, now we can create the account.
+		// If everything checks out, now we can create the account.
 		$newUser = "INSERT INTO ".$web_users." (`username`, `password`, `cachepwd`) VALUES ('".$username."', '".md5($password)."', '".$cachepwd."')";
 		$createNewUser = $modx->db->query($newUser);
 		
 		if (!$createNewUser)
 		{
-			return $this->FormatMessage($this->LanguageArray[9]);
+			//return $this->FormatMessage($this->LanguageArray[9]); sottwell
+			return $this->FormatMessage($this->LanguageArray['register_error']);
 		} 
 		
 		$key = $modx->db->getInsertId();
@@ -641,7 +658,8 @@ class WebLoginPE
 				
 		if (!$insertUserAttr)
 		{
-			return $this->FormatMessage($this->LanguageArray[10]);
+			//return $this->FormatMessage($this->LanguageArray[10]); sottwell
+			return $this->FormatMessage($this->LanguageArray['save_error']);
 		}
 		
 		if (!empty($this->CustomFields) && $this->CustomFields !== '')
@@ -658,7 +676,8 @@ class WebLoginPE
 		
 			if (!$insertExtendedAttr)
 			{
-				return $this->FormatMessage($this->LanguageArray[10]);
+				//return $this->FormatMessage($this->LanguageArray[10]); sottwell
+				return $this->FormatMessage($this->LanguageArray['save_error']);
 			}
 		}
 		// Set group to pending
@@ -696,7 +715,8 @@ class WebLoginPE
 			$groupNames = $modx->db->query("SELECT `id` FROM ".$webgroup_names." WHERE `name` IN (".$groupsList.")");
 			if (!$groupNames)
 			{
-				return $this->FormatMessage($this->LanguageArray[11]);
+				//return $this->FormatMessage($this->LanguageArray[11]); sottwell
+				return $this->FormatMessage($this->LanguageArray['groups_error']);
 			}
 			else
 			{
@@ -743,14 +763,15 @@ class WebLoginPE
 			
 			if (!$Register->Send())
 			{
-				return $this->FormatMessage($this->LanguageArray[12]);
+				//return $this->FormatMessage($this->LanguageArray[12]); sottwell
+				return $this->FormatMessage($this->LanguageArray['email_error']);
 			}
 		}
 		
 		// Add the list of administrators to be notified on new registration to a Blind Carbon Copy.
 		if (isset($notify) && $notify !== '')
 		{
-			$notify = ($notify == 'default' ? $modx->config['emailsender'] : $notify);
+			//$notify = ($notify == 'default' ? $modx->config['emailsender'] : $notify); remove sottwell
 			$emailList = str_replace(', ', ',', $notify);
 			$emailArray = explode(',', $emailList);
 			
@@ -766,7 +787,7 @@ class WebLoginPE
 				$notification = str_replace($toReplace, $value, $notification);
 			}
 			// Cleanup any unused placeholders
-			$notification = ereg_replace('\[\+post\.+[a-zA-Z]+\+\]', '', $notification);
+			//$notification = ereg_replace('\[\+post\.+[a-zA-Z]+\+\]', '', $notification); remove sottwell
 			
 			$Notify = new PHPMailer();
 			$Notify->CharSet = $modx->config['modx_charset'];
@@ -786,7 +807,8 @@ class WebLoginPE
 			}
 		}
 		$this->SessionHandler('destroy');
-		$this->FormatMessage($this->LanguageArray[100].$modx->config['site_name']);
+		//$this->FormatMessage($this->LanguageArray[100].$modx->config['site_name']); sottwell
+		$this->FormatMessage($this->LanguageArray['check_email_new_account'].$modx->config['site_name']);
 		return 'success';
 	}
 	
@@ -818,7 +840,8 @@ class WebLoginPE
 				$deleteFromGroups = $modx->db->query("DELETE FROM ".$web_groups." WHERE `webuser`='".$user['id']."'");
 				
 				// Email the Web Master regarding pruned accounts.
-				$prunedMessage = str_replace('[+000+]', $user['username'], $this->LanguageArray[36]);
+				//$prunedMessage = str_replace('[+000+]', $user['username'], $this->LanguageArray[36]); sottwell
+				$prunedMessage = str_replace('[+000+]', $user['username'], $this->LanguageArray['pruned_message']);
 				$prunedMessage = str_replace('[+111+]', strftime('%A %B %d, %Y', $user['cachepwd']), $prunedMessage);
 				$emailsender = $modx->config['emailsender'];
 				
@@ -826,7 +849,8 @@ class WebLoginPE
 				$Pruned->CharSet = $modx->config['modx_charset'];
 				$Pruned->From = $modx->config['emailsender'];
 				$Pruned->FromName = 'WebLoginPE Pruning Agent';
-				$Pruned->Subject = $this->LanguageArray[35];
+				//$Pruned->Subject = $this->LanguageArray[35]; sottwell
+				$Pruned->Subject = $this->LanguageArray['pruned_subject'];
 				$Pruned->Body = $prunedMessage;
 				$Pruned->AddAddress($emailsender);
 				if (!$Pruned->Send())
@@ -894,7 +918,7 @@ class WebLoginPE
 		
 		$web_users = $modx->getFullTableName('web_users');
 		$web_user_attributes = $modx->getFullTableName('web_user_attributes');
-		$web_groups = $modx->getFullTableName('web_groups');
+		$web_groups = $modx->getFullTableName('web_groups'); 
 		$webgroup_names = $modx->getFullTableName('webgroup_names');
 		
 		// EVENT: OnBeforeWebSaveUser
@@ -914,19 +938,22 @@ class WebLoginPE
 					}
 					else
 					{
-						$this->FormatMessage($this->LanguageArray[3]);
+						//$this->FormatMessage($this->LanguageArray[3]); sottwell
+						$this->FormatMessage($this->LanguageArray['short_password']);
 						return;
 					}
 				}
 				else
 				{
-					$this->FormatMessage($this->LanguageArray[4]);
+					//$this->FormatMessage($this->LanguageArray[4]); sottwell
+					$this->FormatMessage($this->LanguageArray['illegal_password']);
 					return;
 				}
 			}
 			else
 			{
-				$this->FormatMessage($this->LanguageArray[2]);
+				//$this->FormatMessage($this->LanguageArray[2]); sottwell
+				$this->FormatMessage($this->LanguageArray['mismatched_fields']);
 				return;
 			}
 		}
@@ -944,7 +971,8 @@ class WebLoginPE
 			{
 				if ($_POST[$field] !== $_POST[$confirm])
 				{
-					$error = $this->LanguageArray[2].' <br />';
+					//$error = $this->LanguageArray[2].' <br />'; sottwell
+					$error = $this->LanguageArray['mismatched_fields'].' <br />';
 					$fieldMessage .= str_replace('[+000+]', '"'.$field.'"', $error);
 				}
 			}
@@ -1156,7 +1184,8 @@ class WebLoginPE
 			$this->SessionHandler('start');
 		}
 		
-		$this->FormatMessage($this->LanguageArray[101]);
+		//$this->FormatMessage($this->LanguageArray[101]); sottwell
+		$this->FormatMessage($this->LanguageArray['profile_updated']);
 	}
 	
 	
@@ -1177,7 +1206,8 @@ class WebLoginPE
 		
 		if (!$deleteUser || !$deleteAttributes || !$deleteFromGroups || !$deleteFromActiveUsers)
 		{
-			return $this->FormatMessage($this->LanguageArray[13]);
+			//return $this->FormatMessage($this->LanguageArray[13]); sottwell
+			return $this->FormatMessage($this->LanguageArray['delete_error']);
 		}
 		$this->OnWebDeleteUser($internalKey, $deleteUser['username']);
 		return;
@@ -1199,7 +1229,8 @@ class WebLoginPE
 		$internalKey = $currentWebUser['internalKey'];
 		$this->RemoveProfile($internalKey);
 		$this->SessionHandler('destroy');
-		$this->FormatMessage($this->LanguageArray[102]);
+		//$this->FormatMessage($this->LanguageArray[102]); sottwell
+		$this->FormatMessage($this->LanguageArray['profile_deleted']);
 		return;
 	}
 	
@@ -1207,7 +1238,8 @@ class WebLoginPE
 	function RemoveUserProfileManager($internalKey)
 	{
 		$this->RemoveProfile($internalKey);
-		$this->FormatMessage($this->LanguageArray[102]);
+		//$this->FormatMessage($this->LanguageArray[102]); sottwell
+		$this->FormatMessage($this->LanguageArray['profile_deleted']);
 		return;
 	}
 	
@@ -1432,16 +1464,19 @@ class WebLoginPE
 							$userStatus = $modx->db->getRow($lastActive);
 							if ($userStatus['lasthit'] >= time() - (60 * 30))
 							{
-								$user['status'] = $this->LanguageArray[41];
+								//$user['status'] = $this->LanguageArray[41]; sottwell
+								$user['status'] = $this->LanguageArray['online'];
 							}
 							else
 							{
-								$user['status'] = $this->LanguageArray[42];
+								//$user['status'] = $this->LanguageArray[42]; sottwell
+								$user['status'] = $this->LanguageArray['offline'];
 							}
 						}
 						else
 						{
-							$user['status'] = $this->LanguageArray[42];
+							//$user['status'] = $this->LanguageArray[42]; sottwell
+							$user['status'] = $this->LanguageArray['offline'];
 						}
 
 						$eachProfile = $listTemplate;
@@ -1460,7 +1495,8 @@ class WebLoginPE
 							{
 								if ($value == 0)
 								{
-									$value = $this->LanguageArray[33];
+									//$value = $this->LanguageArray[33]; sottwell
+									$value = $this->LanguageArray['unknown'];
 									$eachProfile = str_replace('[+view.age+]', $value, $eachProfile);
 								}
 								else
@@ -1475,7 +1511,8 @@ class WebLoginPE
 							{
 								if ($value == 0)
 								{
-									$value = $this->LanguageArray[33];
+									//$value = $this->LanguageArray[33]; sottwell
+									$value = $this->LanguageArray['unknown'];
 								}
 								else
 								{
@@ -1538,16 +1575,19 @@ class WebLoginPE
 			$userStatus = $modx->db->getRow($lastActive);
 			if ($userStatus['lasthit'] >= time() - (60 * 30))
 			{
-				$viewUser['status'] = $this->LanguageArray[41];
+				//$viewUser['status'] = $this->LanguageArray[41]; sottwell
+				$viewUser['status'] = $this->LanguageArray['online'];
 			}
 			else
 			{
-				$viewUser['status'] = $this->LanguageArray[42];
+				//$viewUser['status'] = $this->LanguageArray[42]; sottwell
+				$viewUser['status'] = $this->LanguageArray['offline'];
 			}
 		}
 		else
 		{
-			$viewUser['status'] = $this->LanguageArray[42];
+			//$viewUser['status'] = $this->LanguageArray[42]; sottwell
+			$viewUser['status'] = $this->LanguageArray['offline'];
 		}
 		
 		foreach ($viewUser as $column => $setting)
@@ -1567,13 +1607,15 @@ class WebLoginPE
 				{
 					if ($this->Type !== 'manager')
 					{
-						$modx->setPlaceholder('view.dob', $this->LanguageArray[33]);
+						//$modx->setPlaceholder('view.dob', $this->LanguageArray[33]); sottwell
+						$modx->setPlaceholder('view.dob', $this->LanguageArray['unknown']);
 					}
 					else
 					{
 						$modx->setPlaceholder('view.dob', '');
 					}
-					$modx->setPlaceholder('view.age', $this->LanguageArray[33]);
+					//$modx->setPlaceholder('view.age', $this->LanguageArray[33]); sottwell
+					$modx->setPlaceholder('view.dob', $this->LanguageArray['unknown']);
 				}
 				else
 				{
@@ -1600,8 +1642,10 @@ class WebLoginPE
 					if ($setting == 'on')
 					{
 						$fieldToReplace = str_replace('private', '', $column);
-						$viewUser[$fieldToReplace] = $this->LanguageArray[38];
-						$modx->setPlaceholder('view.'.$fieldToReplace, $this->LanguageArray[38]);
+						//$viewUser[$fieldToReplace] = $this->LanguageArray[38]; sottwell
+						//$modx->setPlaceholder('view.'.$fieldToReplace, $this->LanguageArray[38]); sottwell
+						$viewUser[$fieldToReplace] = $this->LanguageArray['private'];
+						$modx->setPlaceholder('view.'.$fieldToReplace, $this->LanguageArray['private']);
 					}
 				}// end private
 			}
@@ -1611,8 +1655,10 @@ class WebLoginPE
 		
 		// Handle Special input placeholders.
 		include 'assets/snippets/webloginpe/Default Forms/countryCodes.php';
-		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes);
-		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes);
+		//$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes); sottwell
+		//$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes); sottwell
+		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray['country'], $countryCodes);
+		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray['gender'], $genderCodes);
 
 		foreach ($inputHandler as $value)
 		{
@@ -1772,6 +1818,7 @@ class WebLoginPE
 		if (empty($subject) || $subject == '' || empty($message) || $message == '')
 		{
 			$this->FormatMessage($this->LanguageArray[0]);
+			$this->FormatMessage($this->LanguageArray['required_blank']);
 			$this->ViewUserProfile($you['username']);
 			return;
 		}
@@ -1790,7 +1837,8 @@ class WebLoginPE
 			$this->ViewUserProfile($you['username']);
 			return;
 		}
-		$this->FormatMessage($this->LanguageArray[37].' "'.$you['username'].'"');
+		//$this->FormatMessage($this->LanguageArray[37].' "'.$you['username'].'"'); sottwell
+		$this->FormatMessage($this->LanguageArray['message_sent'].' "'.$you['username'].'"');
 		$this->ViewUserProfile($you['username']);
 		return;
 	}
@@ -1812,7 +1860,8 @@ class WebLoginPE
 		$web_user_attributes = $modx->getFullTableName('web_user_attributes');
 		
 		$email = $modx->db->escape(trim($_POST['email'])); // pixelchutes
-		if ( empty($email) ) return $this->FormatMessage($this->LanguageArray[0]); // pixelchutes        
+		//if ( empty($email) ) return $this->FormatMessage($this->LanguageArray[0]); // pixelchutes sottwell
+		if ( empty($email) ) return $this->FormatMessage($this->LanguageArray['required_blank']); // pixelchutes        
         $webpwdreminder_message = $modx->config['webpwdreminder_message'];
         $emailsubject = $modx->config['emailsubject'];
 		$site_name = $modx->config['site_name'];
@@ -1859,14 +1908,17 @@ class WebLoginPE
 
 			if (!$Reset->Send())
 			{
-				return $this->FormatMessage($this->LanguageArray[12]);
+				//return $this->FormatMessage($this->LanguageArray[12]); sottwell
+				return $this->FormatMessage($this->LanguageArray['email_error']);
 			}
 		}
 		else
 		{
-			return $this->FormatMessage($this->LanguageArray[14]);
+			//return $this->FormatMessage($this->LanguageArray[14]); sottwell
+			return $this->FormatMessage($this->LanguageArray['no_account']);
 		}
-		$this->FormatMessage($this->LanguageArray[103]);
+		//$this->FormatMessage($this->LanguageArray[103]); sottwell
+		$this->FormatMessage($this->LanguageArray['check_email_new_password']);
 		return;
 	}
 	
@@ -1898,7 +1950,8 @@ class WebLoginPE
 		
 		if ($limit !==1)
 		{
-			return $this->FormatMessage($this->LanguageArray[15]);
+			//return $this->FormatMessage($this->LanguageArray[15]); sottwell
+			return $this->FormatMessage($this->LanguageArray['error_loading']);
 		}
 		
 		$this->User = $modx->db->getRow($userInfo);
@@ -1906,7 +1959,8 @@ class WebLoginPE
 		
 		if (($passwordKey !== $cachePassword) || ($activationKey !== $cacheKey))
 		{
-			return $this->FormatMessage($this->LanguageArray[16]);
+			//return $this->FormatMessage($this->LanguageArray[16]); sottwell
+			return $this->FormatMessage($this->LanguageArray['invalid_activation']);
 		}
 		
 		if (!empty($newPassword) && isset($newPassword) && isset($newPasswordConfirm))
@@ -1928,24 +1982,29 @@ class WebLoginPE
 					}
 					else
 					{
-						return $this->FormatMessage($this->LanguageArray[3]);
+						//return $this->FormatMessage($this->LanguageArray[3]); sottwell
+						return $this->FormatMessage($this->LanguageArray['short_password']);
 					}
 				}
 				else
 				{
-					return $this->FormatMessage($this->LanguageArray[4]);
+					//return $this->FormatMessage($this->LanguageArray[4]); sottwell
+					return $this->FormatMessage($this->LanguageArray['illegal_password']);
 				}
 			}
 			else
 			{
-				return $this->FormatMessage($this->LanguageArray[2]);
+				//return $this->FormatMessage($this->LanguageArray[2]); sottwell
+				return $this->FormatMessage($this->LanguageArray['mismatched_fields']);
 			}
 		}
 		if(!$saveMyPassword || !$unblockUser)
 		{ 
-			return $this->FormatMessage($this->LanguageArray[17]);
+			//return $this->FormatMessage($this->LanguageArray[17]); sottwell
+			return $this->FormatMessage($this->LanguageArray['activation_error']);
 		}
-		$this->FormatMessage($this->LanguageArray[104]);
+		//$this->FormatMessage($this->LanguageArray[104]); sottwell
+		$this->FormatMessage($this->LanguageArray['new_password_activated']);
 		return;
 	}
 	
@@ -1990,7 +2049,7 @@ class WebLoginPE
 					// $value = html_entity_decode($value);
 					if ($key == 'id')
 					{
-						// Do Nothing, we don't need that shit in the placeholders.
+						// Do Nothing, we don't need that in the placeholders.
 					}
 					else if ($key == 'dob')
 					{
@@ -2003,7 +2062,8 @@ class WebLoginPE
 					{
 						if ($value == 0)
 						{
-							$modx->setPlaceholder('user.'.$key, $this->LanguageArray[33]);
+							//$modx->setPlaceholder('user.'.$key, $this->LanguageArray[33]); sottwell
+							$modx->setPlaceholder('user.'.$key, $this->LanguageArray['unknown']);
 						}
 						else
 						{
@@ -2040,8 +2100,10 @@ class WebLoginPE
 		
 		// Handle Special input placeholders.
 		include_once 'assets/snippets/webloginpe/Default Forms/countryCodes.php';
-		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes);
-		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes);
+		//$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray[39], $countryCodes);
+		//$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray[40], $genderCodes); sottwell
+		$inputHandler[9998] = str_replace('[+COUNTRYLABEL+]', $this->LanguageArray['country'], $countryCodes);
+		$inputHandler[9999] = str_replace('[+GENDERLABEL+]', $this->LanguageArray['gender'], $genderCodes);
 
 		foreach ($inputHandler as $value)
 		{
@@ -2268,7 +2330,8 @@ class WebLoginPE
 				
 				$failedLoginCount = $this->User['failedlogincount'];
 				
-				$anError = $this->LanguageArray[20];
+				//$anError = $this->LanguageArray[20]; sottwell
+				$anError = $this->LanguageArray['failed_count'];
 				$anError = str_replace('[+000+]', $failedLoginCount, $anError);
 				$anError = str_replace('[+111+]', $modx->config['blocked_minutes'], $anError);
 				$anError = str_replace('[+222+]', $modx->config['failed_login_attempts'], $anError);
@@ -2623,7 +2686,8 @@ class WebLoginPE
 		if ($this->User['failedlogincount'] >= $modx->config['failed_login_attempts'] && $this->User['blockeduntil'] > time())
 		{
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[22]);
+	        //return $this->FormatMessage($this->LanguageArray[22]); sottwell
+	        return $this->FormatMessage($this->LanguageArray['too_many_failed']);
 	    }
 	
 		if ($this->User['failedlogincount'] >= $modx->config['failed_login_attempts'] && $this->User['blockeduntil'] < time())
@@ -2636,7 +2700,8 @@ class WebLoginPE
 		if ($this->User['blocked'] == "1")
 		{ // this user has been blocked by an admin, so no way he's loggin in!
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[23]);
+	        //return $this->FormatMessage($this->LanguageArray[23]); sottwell
+	        return $this->FormatMessage($this->LanguageArray['blocked_by_admin']);
 	    }
 			
 		if ($this->User['blockeduntil'] >= time())
@@ -2646,21 +2711,24 @@ class WebLoginPE
 			$blockedMinutes = substr($UserIsBlockedUntil, 0, strpos($UserIsBlockedUntil, "."));
 			
 			$this->SessionHandler('destroy');
-			$anError = str_replace('[+000+]', $blockedMinutes, $this->LanguageArray[24]);
+			//$anError = str_replace('[+000+]', $blockedMinutes, $this->LanguageArray[24]); sottwell
+			$anError = str_replace('[+000+]', $blockedMinutes, $this->LanguageArray['blocked_until']);
 			return $this->FormatMessage($anError);
 		}
 	
 		if($this->User['blockedafter'] > 0 && $this->User['blockedafter'] < time())
 		{ // this user has a block after date
 	        $this->SessionHandler('destroy');
-	        return $this->FormatMessage($this->LanguageArray[23]);
+	        //return $this->FormatMessage($this->LanguageArray[23]); sottwell
+	        return $this->FormatMessage($this->LanguageArray['blocked_by_admin']);
 	    }
 	
 		if (isset($modx->config['allowed_ip']))
 		{
 	        if (strpos($modx->config['allowed_ip'],$_SERVER['REMOTE_ADDR'])===false)
 			{
-	            return $this->FormatMessage($this->LanguageArray[25]);
+	            //return $this->FormatMessage($this->LanguageArray[25]); sottwell
+	            return $this->FormatMessage($this->LanguageArray['bad_location']);
 	        }
 	    }
 	
@@ -2670,7 +2738,8 @@ class WebLoginPE
 	        $day = $date['wday']+1;
 	        if (strpos($modx->config['allowed_days'], $day) === false)
 			{
-	            return $this->FormatMessage($this->LanguageArray[26]);
+	            //return $this->FormatMessage($this->LanguageArray[26]); sottwell
+	            return $this->FormatMessage($this->LanguageArray['bad_time']);
 	        }        
 	    }
 		
@@ -2722,14 +2791,16 @@ class WebLoginPE
 		if ($_FILES['photo']['size'] >= $imageAttributes[0])
 		{
 			$sizeInKb = round($imageAttributes[0] / 1024);
-			$sizeError = str_replace('[+000+]', $sizeInKb, $this->LanguageArray[28]);
+			//$sizeError = str_replace('[+000+]', $sizeInKb, $this->LanguageArray[28]); sottwell
+			$sizeError = str_replace('[+000+]', $sizeInKb, $this->LanguageArray['big_photo']);
 			return $this->FormatMessage($sizeError);
 		}
 		
 		$userImage = $modx->config['base_path'].strtolower(str_replace(' ', '-', basename( $_FILES['photo']['name'])));
 		if (!move_uploaded_file($_FILES['photo']['tmp_name'], $userImage))
 		{
-			return $this->FormatMessage($this->LanguageArray[29]);
+			//return $this->FormatMessage($this->LanguageArray[29]); sottwell
+			return $this->FormatMessage($this->LanguageArray['failed_image_upload']);
 		}
 		
 		// License and registration ma'am. I need to se an ID!
@@ -2796,7 +2867,8 @@ class WebLoginPE
 				break;
 				
 			default	:
-				return $this->FormatMessage($this->LanguageArray[30]);
+				//return $this->FormatMessage($this->LanguageArray[30]); sottwell
+				return $this->FormatMessage($this->LanguageArray['photo_type']);
 				break;
 		}
 		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
@@ -2841,18 +2913,18 @@ class WebLoginPE
 	 */
 	function StringForGenderInt($genderInt)
 	{
-		// use language file by Jako
+		
 		if ($genderInt == 1)
 		{
-			return isset($this->LanguageArray[106]) ? $this->LanguageArray[106] : 'Male';
+			return 'Male';
 		}
 		else if ($genderInt == 2)
 		{
-			return isset($this->LanguageArray[107]) ? $this->LanguageArray[107] : 'Female';
+			return 'Female';
 		}
 		else
 		{
-			return $this->LanguageArray[33];
+			return 'Unknown';
 		}
 		
 	}
