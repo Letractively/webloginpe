@@ -11,10 +11,11 @@
      *              Added ability to approve certain domains [approvedDomains];
      *              Added ability to set what group is used for pending users [Pending Users];
      *              See http://xrl.us/oqaq6 for more detail on changes;[r11][r75]
-     *              No log details for this revision [r36][r76]
-     *              config, stylesheet and lang array modifications by sottwell August 2009[r54][r77]
-     *              Multiple instances added vhollo [r25][r79]
-     *              fixed '&usersList' fixed placeholders vhollo [r40][r80]
+     *       No log details for this revision [r36][r76]
+     *       config, stylesheet and lang array modifications by sottwell August 2009[r54][r77]
+     *       Multiple instances added vhollo [r25][r79]
+     *       fixed '&usersList' fixed placeholders vhollo [r40][r80]
+     *       no log message vhollo [r42][r81]
      * 
      *
 	 * @package WebLoginPE
@@ -34,14 +35,15 @@
                 $service = $_REQUEST['serviceButtonValue'];
         }
 
-     $id = isset($id) ? $id: '';
+     
      $req_id = $_REQUEST['wlpeID'] ? $_REQUEST['wlpeID'] : '';
      $hide = isset($hide) ? $hide : 0; // or 1 if you prefer to hide as default ;)
-     if ($service && $id !== $req_id) 
+     if ($service && $id && $id !== $req_id) 
         {
             if ($hide) return; // skip this instance
             $service=''; // run this instance without mess
         }
+    $id = isset($id) ? $id: '';
 	// end vhollo multiple instances
 	
 	// Allow use of a config file sottwell
