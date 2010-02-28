@@ -122,7 +122,7 @@
 					</label>
 
 					<label for="wlpeUserProfilePasswordConfirm">New Password (confirm)
-					<input id="wlpeUserProfilePasswordConfirm" type="password" name="password.confirm" />
+					<input id="wlpeUserProfilePasswordConfirm" type="password" name="password_confirm" />
 					</label>
 				</fieldset>
 				
@@ -166,7 +166,7 @@
 				<input type="password" id="wlpeNewPassword" name="newpassword" />
 				</label>
 				<label for="wlpeNewPasswordConfirm">New password (Confirm)
-				<input type="password" id="wlpeNewPasswordConfirm" name="newpassword.confirm" />
+				<input type="password" id="wlpeNewPasswordConfirm" name="newpassword_confirm" />
 				</label>
 				
 			</fieldset>
@@ -299,7 +299,7 @@
 				</label>
 
 				<label for="wlpeUserRegisterPasswordConfirm"><span class="required">*</span> Password (confirm)
-				<input id="wlpeUserRegisterPasswordConfirm" type="password" name="password.confirm" value="[+post.password.confirm+]" />
+				<input id="wlpeUserRegisterPasswordConfirm" type="password" name="password_confirm" value="[+post.password_confirm+]" />
 				</label>
 
 				<label for="wlpeUserRegisterPhone">Phone number
@@ -521,7 +521,7 @@
 					</label>
 
 					<label for="wlpeUserProfilePasswordConfirm">New Password (confirm)
-					<input id="wlpeUserProfilePasswordConfirm" type="password" name="password.confirm" value="" />
+					<input id="wlpeUserProfilePasswordConfirm" type="password" name="password_confirm" value="" />
 					</label>
 				</fieldset>
 
