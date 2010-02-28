@@ -20,6 +20,7 @@
  *        No Log file for this revision [r36][r76]
  *        Small fix for PNG Userimages [r61][r77]
  *        Commit class updates sottwell [r55][r78]
+ *        Multiple instances added vhollo [r24][r79]
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
@@ -168,7 +169,7 @@ class WebLoginPE
 	 * @return void
 	 * @author Scotty Delicious
 	 */
-	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000, $id='')
 	{
 		require_once 'manager/includes/controls/class.phpmailer.php';
 		$this->LanguageArray = $LanguageArray;
@@ -177,10 +178,12 @@ class WebLoginPE
 		$this->Type = $type;
 		//Added by Taff
 		$this->Pagination = $paging;
+		// Added by Vhollo
+		$this->WlpeId = $id;
 		//Added by Jako
-		if (isset($this->LanguageArray[43]))
+		if (isset($this->LanguageArray['language']))
 		{
-			setlocale ( LC_TIME, $this->LanguageArray[43] );
+			setlocale ( LC_TIME, $this->LanguageArray['language'] );
 		}
 		
 	}
@@ -191,11 +194,11 @@ class WebLoginPE
 	 *
 	 * @see __construct
 	 */
-	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
+	function WebLoginPE($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000, $id='')
 	{
 		if(substr(phpversion(),0,1) < 5)
 		{	
-			$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging);
+			$this->__construct($LanguageArray, $dateFormat, $UserImageSettings, $type, $paging, $id);
 		}
 		
 	}
@@ -217,7 +220,7 @@ class WebLoginPE
 		unset($this->Report);
 		$messageTemplate = str_replace('[+wlpe.message.text+]', $message, $this->MessageTemplate);
 		$this->Report = $messageTemplate;
-		$modx->setPlaceholder('wlpe.message', $messageTemplate);
+		$modx->setPlaceholder($this->WlpeId.'wlpe.message', $messageTemplate);
 		unset ($messageTemplate);
 		return;
 	}
@@ -247,7 +250,7 @@ class WebLoginPE
 			$this->FormatMessage($this->LanguageArray['required_blank']);
 			return;
 		}
-		$_SESSION['groups'] = array('Registered Users', 'Fans');
+		//$_SESSION['groups'] = array('Registered Users', 'Fans'); removed vhollo
 		$this->OnBeforeWebLogin();
 		$this->User = $this->QueryDbForUser($this->Username);
 
@@ -1251,7 +1254,7 @@ class WebLoginPE
 	 * @return string HTML block containing all the users
 	 * @author Scotty Delicious
 	 */
-	function ViewAllUsers($userTemplate, $outerTemplate, $listUsers)
+	function ViewAllUsers($userTemplate, $outerTemplate, $listUsers, $id)
 	{
 		global $modx;
 		
@@ -1303,7 +1306,8 @@ class WebLoginPE
 				}
 				else
 				{
-					$listOuterTemplate = $this->Template($listOuterTemplate);
+					//$listOuterTemplate = $this->Template($listOuterTemplate);vhollo
+					$listOuterTemplate = $this->AddId($this->Template($listOuterTemplate),$id);
 				}
 				//return $listOuterTemplate;
 				
@@ -1314,7 +1318,8 @@ class WebLoginPE
 				}
 				else
 				{
-					$listTemplate = $this->Template($listTemplate);
+					//$listTemplate = $this->Template($listTemplate); vhollo
+					$listTemplate = $this->AddId($this->Template($listTemplate),$id);
 				}
 				
 				$listSortBy = $format[3];
@@ -2426,7 +2431,7 @@ class WebLoginPE
 			}
 			else 
 			{
-				$url = $modx->makeURL($this->loHomeId);
+				$url = $modx->makeURL($this->liHomeId); // CREDIT lo to li vhollo
 		        $modx->sendRedirect($url,0,'REDIRECT_HEADER'); // CREDIT: Guillaume to redirect directely
 		        return;
 			}
@@ -3187,7 +3192,17 @@ class WebLoginPE
 			);
 		$modx->invokeEvent('OnWebLogout', $parameters);
 	}
-	
+
+	function AddId($toTpl,$id)
+	{
+		if($id)
+		{
+			$toTpl = str_replace('</form>', '<div><input type="hidden" name="wlpeID" value="'.$id.'" /></div></form>', $toTpl);
+			$toTpl = str_replace('service=', 'wlpeID='.$id.'&amp;service=', $toTpl);
+			$toTpl = str_replace('[+wlpe', '[+'.$id.'wlpe', $toTpl);
+		}
+		return $toTpl;
+	}
 	
 }
 // end WebLoginPE Class
