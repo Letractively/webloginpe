@@ -21,6 +21,7 @@
  *        Small fix for PNG Userimages [r61][r77]
  *        Commit class updates sottwell [r55][r78]
  *        Multiple instances added vhollo [r24][r79]
+ *        fixed '&usersList'  fixed placeholders vhollo [r39] inc with [r24]
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1

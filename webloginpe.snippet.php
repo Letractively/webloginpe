@@ -14,6 +14,8 @@
      *              No log details for this revision [r36][r76]
      *              config, stylesheet and lang array modifications by sottwell August 2009[r54][r77]
      *              Multiple instances added vhollo [r25][r79]
+     *              fixed '&usersList' fixed placeholders vhollo [r40][r80]
+     * 
      *
 	 * @package WebLoginPE
 	 * @author Scotty Delicious
@@ -35,7 +37,7 @@
      $id = isset($id) ? $id: '';
      $req_id = $_REQUEST['wlpeID'] ? $_REQUEST['wlpeID'] : '';
      $hide = isset($hide) ? $hide : 0; // or 1 if you prefer to hide as default ;)
-     if ($service && $id != $req_id) 
+     if ($service && $id !== $req_id) 
         {
             if ($hide) return; // skip this instance
             $service=''; // run this instance without mess
@@ -77,11 +79,11 @@
 	else
 	{
 		include_once MODX_BASE_PATH.'assets/snippets/webloginpe/lang/en.php';
-		$modx->setPlaceholder('wlpe.message', $wlpe_lang['bad_langfile']); //sottwell
-		print '[+wlpe.message+]';
+		$modx->setPlaceholder($id.'wlpe.message', $wlpe_lang['bad_langfile']); //sottwell
+		print '[+'.$id.'wlpe.message+]';
 	}
 	
-	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging);
+	$wlpe = new WebLoginPE($wlpe_lang, $dateFormat, $userImageSettings, $type, $paging, $id);
 	$wlpe->CustomTable($customTable, $customFields, $prefixTable, $tableCheck);
 	$wlpe->dobFormat = $dobFormat; // add by Bruno
 
@@ -97,24 +99,31 @@
 	$activateConfig = isset($activateConfig) ? $activateConfig : '';
 	$activatePost = isset($activatePost) ? $activatePost : '';
 	
-    if ($regType == 'verify'){$wlpeRegisterTpl = $wlpe->AddInstance($wlpeRegisterVerifyTpl, $id);}else{$wlpeRegisterTpl = $wlpe->AddInstance($wlpeRegisterInstantTpl, $id);}
+    if ($regType == 'verify')
+    	{
+    		$wlpeRegisterTpl = $wlpe->AddId($wlpeRegisterVerifyTpl, $id);
+    	}
+    else
+    	{
+    		$wlpeRegisterTpl = $wlpe->AddId($wlpeRegisterInstantTpl, $id);
+    	}
         
-    $displayLoginFormTpl = $wlpe->AddInstance(isset($loginFormTpl) ? $wlpe->Template($loginFormTpl) : $wlpeDefaultFormTpl, $id);
-    $displaySuccessTpl = $wlpe->AddInstance(isset($successTpl) ? $wlpe->Template($successTpl) : $wlpeDefaultSuccessTpl, $id);
-    $displayRegisterTpl = $wlpe->AddInstance(isset($registerTpl) ? $wlpe->Template($registerTpl) : $wlpeRegisterTpl, $id);
-    $displayRegSuccessTpl = $wlpe->AddInstance(isset($registerSuccessTpl) ? $wlpe->Template($registerSuccessTpl) : $wlpeDefaultFormTpl, $id);
-    $displayProfileTpl = $wlpe->AddInstance(isset($profileTpl) ? $wlpe->Template($profileTpl) : $wlpeProfileTpl, $id);
-    $displayViewProfileTpl = $wlpe->AddInstance(isset($viewProfileTpl) ? $wlpe->Template($viewProfileTpl) : $wlpeViewProfileTpl, $id);
-    $displayUsersOuterTpl = $wlpe->AddInstance(isset($usersOuterTpl) ? $wlpe->Template($usersOuterTpl) : $wlpeUsersOuterTpl, $id);
-    $displayUsersTpl = $wlpe->AddInstance(isset($usersTpl) ? $wlpe->Template($usersTpl) : $wlpeUsersTpl, $id);
-    $displayManageOuterTpl = $wlpe->AddInstance(isset($manageOuterTpl) ? $wlpe->Template($manageOuterTpl) : $wlpeUsersOuterTpl, $id);
+    $displayLoginFormTpl = $wlpe->AddId(isset($loginFormTpl) ? $wlpe->Template($loginFormTpl) : $wlpeDefaultFormTpl, $id);
+    $displaySuccessTpl = $wlpe->AddId(isset($successTpl) ? $wlpe->Template($successTpl) : $wlpeDefaultSuccessTpl, $id);
+    $displayRegisterTpl = $wlpe->AddId(isset($registerTpl) ? $wlpe->Template($registerTpl) : $wlpeRegisterTpl, $id);
+    $displayRegSuccessTpl = $wlpe->AddId(isset($registerSuccessTpl) ? $wlpe->Template($registerSuccessTpl) : $wlpeDefaultFormTpl, $id);
+    $displayProfileTpl = $wlpe->AddId(isset($profileTpl) ? $wlpe->Template($profileTpl) : $wlpeProfileTpl, $id);
+    $displayViewProfileTpl = $wlpe->AddId(isset($viewProfileTpl) ? $wlpe->Template($viewProfileTpl) : $wlpeViewProfileTpl, $id);
+    $displayUsersOuterTpl = $wlpe->AddId(isset($usersOuterTpl) ? $wlpe->Template($usersOuterTpl) : $wlpeUsersOuterTpl, $id);
+    $displayUsersTpl = $wlpe->AddId(isset($usersTpl) ? $wlpe->Template($usersTpl) : $wlpeUsersTpl, $id);
+    $displayManageOuterTpl = $wlpe->AddId(isset($manageOuterTpl) ? $wlpe->Template($manageOuterTpl) : $wlpeUsersOuterTpl, $id);
     $displayManageTpl = $wlpe->AddInstance(isset($manageTpl) ? $wlpe->Template($manageTpl) : $wlpeManageTpl, $id);
-    $displayManageProfileTpl = $wlpe->AddInstance(isset($manageProfileTpl) ? $wlpe->Template($manageProfileTpl) : $wlpeManageProfileTpl, $id);
-    $displayManageDeleteTpl = $wlpe->AddInstance(isset($manageDeleteTpl) ? $wlpe->Template($manageDeleteTpl) : $wlpeManageDeleteTpl, $id);
-    $displayProfileDeleteTpl = $wlpe->AddInstance(isset($profileDeleteTpl) ? $wlpe->Template($profileDeleteTpl) : $wlpeProfileDeleteTpl, $id);
-    $displayActivateTpl = $wlpe->AddInstance(isset($activateTpl) ? $wlpe->Template($activateTpl) : $wlpeActivateTpl, $id);
-    $displayResetTpl = $wlpe->AddInstance(isset($resetTpl) ? $wlpe->Template($resetTpl) : $wlpeResetTpl, $id);
-    $notifyTpl = $wlpe->AddInstance(isset($notifyTpl) ? $wlpe->Template($notifyTpl) : $wlpeNotifyTpl, $id);
+    $displayManageProfileTpl = $wlpe->AddId(isset($manageProfileTpl) ? $wlpe->Template($manageProfileTpl) : $wlpeManageProfileTpl, $id);
+    $displayManageDeleteTpl = $wlpe->AddId(isset($manageDeleteTpl) ? $wlpe->Template($manageDeleteTpl) : $wlpeManageDeleteTpl, $id);
+    $displayProfileDeleteTpl = $wlpe->AddId(isset($profileDeleteTpl) ? $wlpe->Template($profileDeleteTpl) : $wlpeProfileDeleteTpl, $id);
+    $displayActivateTpl = $wlpe->AddId(isset($activateTpl) ? $wlpe->Template($activateTpl) : $wlpeActivateTpl, $id);
+    $displayResetTpl = $wlpe->AddId(isset($resetTpl) ? $wlpe->Template($resetTpl) : $wlpeResetTpl, $id);
+    $notifyTpl = $wlpe->AddId(isset($notifyTpl) ? $wlpe->Template($notifyTpl) : $wlpeNotifyTpl, $id);
     $notifySubject = isset($notifySubject) ? $notifySubject : 'New Web User for '.$modx->config['site_name'].'.';
     $messageTpl = isset($messageTpl) ? $wlpe->Template($messageTpl) : $wlpeMessageTpl;
     $tosChunk = isset($tosChunk) ? $wlpe->Template($tosChunk) : $wlpeTos;
@@ -234,7 +243,7 @@
 			case 'confirmdeleteprofile':
 				if (in_array('confirmdeleteprofile', $disableServices)){return;}
 				$wlpe->RemoveUserProfile();
-				return '[+wlpe.message+]';
+				return '[+'.$id.'wlpe.message+]';
 				break;
 				
 			default :
@@ -385,7 +394,7 @@
 			case 'confirmdeleteprofilesimple':
 				if (in_array('confirmdeleteprofile', $disableServices)){return;}
 				$wlpe->RemoveUserProfile();
-				return '[+wlpe.message+]';
+				return '[+'.$id.'wlpe.message+]';
 				break;
 
 			case 'registernew' :
