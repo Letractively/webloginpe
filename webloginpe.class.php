@@ -22,6 +22,7 @@
  *        Commit class updates sottwell [r55][r78]
  *        Multiple instances added vhollo [r24][r79]
  *        fixed '&usersList'  fixed placeholders vhollo [r39] inc with [r24]
+ *        Fixed issue on password reset/activate added Function ClearCache() vhollo [r44][r79] 
  *        
  * @package WebLoginPE
  * @author Scotty Delicious scottydelicious@gmail.com * @version 1.3.1
@@ -1122,11 +1123,11 @@ class WebLoginPE
 		 		$activateId = (!empty($activateId) ? $activateId : $modx->documentIdentifier);
 		 		if($_SERVER['SERVER_PORT']!='80')
 		 		{
-		 			$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
+		 			$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($activateId,'',"&wlpeID=".$this->WlpeId."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
 		 		}
 		 		else
 		 		{
-		 			$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].$modx->makeURL($activateId,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
+		 			$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].$modx->makeURL($activateId,'',"&wlpeID=".$this->WlpeId."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
 		 			//$url = $_SERVER['HTTP_REFERER']."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey;
 		 		}
 		 		
@@ -1889,12 +1890,12 @@ class WebLoginPE
 			// build activation url
             if($_SERVER['SERVER_PORT']!='80')
 			{
-				$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($modx->documentIdentifier,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
+				$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$modx->makeURL($modx->documentIdentifier,'',"&wlpeID=".$this->WlpeId."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
 			}
 			else
 			{
 				//$url = $modx->config['server_protocol'].'://'.$_SERVER['SERVER_NAME'].$modx->makeURL($modx->documentIdentifier,'',"&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey);
-				$url = $_SERVER['HTTP_REFERER']."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey;
+				$url = $_SERVER['HTTP_REFERER']."&wlpeID=".$this->WlpeId."&service=activate&userid=".$this->User['id']."&activationkey=".$newPasswordKey;
             }
 			
 			$message = str_replace("[+uid+]", $this->User['username'], $webpwdreminder_message);
@@ -3204,6 +3205,16 @@ class WebLoginPE
 		}
 		return $toTpl;
 	}
+	
+	function ClearCache() 
+	{
+		include_once $modx->config['base_path']."manager/processors/cache_sync.class.processor.php";
+		$sync = new synccache();
+		$sync->setCachepath("assets/cache/");
+		$sync->setReport(false);
+		$sync->emptyCache();
+	}
+
 	
 }
 // end WebLoginPE Class
