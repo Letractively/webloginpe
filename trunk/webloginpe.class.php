@@ -153,7 +153,8 @@ class WebLoginPE
 	 */
 	function __construct($LanguageArray, $dateFormat = '%A %B %d, %Y at %I:%M %p', $UserImageSettings = '105000,100,100', $type = 'simple', $paging = 3000)
 	{
-		require_once 'manager/includes/controls/class.phpmailer.php';
+		if (!class_exists('PHPMailer'))
+			include_once (MODX_BASE_PATH.'manager/includes/controls/class.phpmailer.php');
 		$this->LanguageArray = $LanguageArray;
 		$this->DateFormat = $dateFormat;
 		$this->UserImageSettings = $UserImageSettings;
